@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Depends
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import get_rag_service
 from app.schemas.rag import RAGQueryRequest, RAGQueryResponse
 from app.services.rag_service import RAGService
+from app.services.retrieval_service import RetrievalServiceError
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -13,4 +18,11 @@ async def query_rag(
     rag_service: RAGService = Depends(get_rag_service),
 ) -> RAGQueryResponse:
     """Run a multimodal RAG query against the configured retriever."""
-    return await rag_service.answer(payload)
+    try:
+        return await rag_service.answer(payload)
+    except RetrievalServiceError as exc:
+        logger.exception("RAG query endpoint failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
+        ) from exc

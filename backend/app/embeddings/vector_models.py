@@ -57,6 +57,7 @@ class VectorIndexStats(BaseModel):
     index_name: str = "placement_faiss_index"
     vector_count: int = 0
     dimensions: int = 384
+    embedding_model: str | None = None
     index_type: str = "IndexFlatIP"
     metric: str = "cosine_similarity"
     metadata_count: int = 0

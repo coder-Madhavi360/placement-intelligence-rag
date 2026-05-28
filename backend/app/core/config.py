@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field
@@ -28,12 +29,16 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_json: bool = False
 
-    embedding_provider: Literal["local", "openai", "huggingface"] = "local"
-    embedding_model: str = "local-hash-embedding"
+    embedding_provider: Literal["local", "sentence_transformers", "openai", "huggingface"] = "local"
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     embedding_dimensions: int = 384
+    embedding_batch_size: int = 32
+    embedding_cache_path: Path = Path("data/vectorstores/all_minilm_l6_v2_cache.json")
 
-    vector_store: Literal["memory", "qdrant", "pinecone", "weaviate"] = "memory"
+    vector_store: Literal["memory", "faiss", "qdrant", "pinecone", "weaviate"] = "memory"
     vector_collection: str = "placement_intelligence"
+    faiss_index_path: Path = Path("data/vectorstores/placement_intelligence.faiss")
+    faiss_metadata_path: Path = Path("data/vectorstores/placement_intelligence.metadata.json")
     qdrant_url: str | None = None
     qdrant_api_key: str | None = None
     pinecone_api_key: str | None = None

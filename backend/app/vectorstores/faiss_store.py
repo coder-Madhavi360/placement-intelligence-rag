@@ -28,6 +28,12 @@ class FAISSVectorStore:
     def count(self) -> int:
         return int(self.index.ntotal)
 
+    @property
+    def embedding_model(self) -> str | None:
+        if not self._records:
+            return None
+        return self._records[0].model_name
+
     def add(self, records: list[EmbeddedChunk]) -> VectorIndexStats:
         if not records:
             return self.stats()
@@ -47,6 +53,7 @@ class FAISSVectorStore:
         filters: dict[str, str | int | float | bool] | None = None,
     ) -> list[VectorSearchResult]:
         if self.count == 0:
+            logger.warning("FAISS search requested against an empty index")
             return []
         if top_k < 1:
             raise FAISSStoreError("top_k must be at least 1.")
@@ -57,7 +64,18 @@ class FAISSVectorStore:
 
         faiss.normalize_L2(query)
         search_k = min(max(top_k * 8, top_k), self.count)
+        logger.info(
+            "Executing FAISS search: requested_top_k=%s expanded_search_k=%s index_vectors=%s dimensions=%s",
+            top_k,
+            search_k,
+            self.count,
+            self.dimensions,
+        )
         scores, indices = self.index.search(query, search_k)
+        logger.info(
+            "FAISS raw search scores: %s",
+            [round(float(score), 6) for score in scores[0][:top_k]],
+        )
 
         results: list[VectorSearchResult] = []
         for score, index in zip(scores[0], indices[0], strict=True):
@@ -83,7 +101,12 @@ class FAISSVectorStore:
             if len(results) >= top_k:
                 break
 
-        logger.info("FAISS search returned %s result(s) for top_k=%s", len(results), top_k)
+        logger.info(
+            "FAISS search returned %s result(s) for top_k=%s; result_scores=%s",
+            len(results),
+            top_k,
+            [round(result.score, 6) for result in results],
+        )
         return results
 
     def save(self, index_path: str | Path, metadata_path: str | Path) -> VectorIndexStats:
@@ -115,10 +138,21 @@ class FAISSVectorStore:
         index_path = Path(index_path).expanduser().resolve()
         metadata_path = Path(metadata_path).expanduser().resolve()
 
+        logger.info("Loading FAISS index from %s", index_path)
+        logger.info("Loading FAISS metadata from %s", metadata_path)
+
         if not index_path.exists() or not metadata_path.exists():
-            raise FAISSStoreError("Both FAISS index and metadata files are required for loading.")
+            raise FAISSStoreError(
+                f"Both FAISS index and metadata files are required. "
+                f"index_exists={index_path.exists()} metadata_exists={metadata_path.exists()}"
+            )
 
         try:
+            logger.info(
+                "FAISS index file size=%s bytes; metadata file size=%s bytes",
+                index_path.stat().st_size,
+                metadata_path.stat().st_size,
+            )
             payload = json.loads(metadata_path.read_text(encoding="utf-8"))
             store = cls(dimensions=int(payload["dimensions"]), index_name=payload.get("index_name", "placement_faiss_index"))
             store.index = faiss.read_index(str(index_path))
@@ -129,8 +163,25 @@ class FAISSVectorStore:
 
         if store.count != len(store._records):
             raise FAISSStoreError("FAISS index count does not match metadata record count.")
+        if store.index.d != store.dimensions:
+            raise FAISSStoreError(
+                f"FAISS index dimension mismatch: index={store.index.d} metadata={store.dimensions}"
+            )
+        for record in store._records:
+            if record.dimensions != store.dimensions or len(record.embedding) != store.dimensions:
+                raise FAISSStoreError(
+                    f"Metadata vector dimension mismatch for chunk {record.id}: "
+                    f"record_dimensions={record.dimensions} vector_length={len(record.embedding)} "
+                    f"index_dimensions={store.dimensions}"
+                )
 
-        logger.info("Loaded FAISS index with %s vector(s)", store.count)
+        logger.info(
+            "Loaded FAISS index successfully: vectors=%s metadata_records=%s dimensions=%s embedding_model=%s",
+            store.count,
+            len(store._records),
+            store.dimensions,
+            store.embedding_model,
+        )
         return store
 
     def stats(self) -> VectorIndexStats:
@@ -138,6 +189,7 @@ class FAISSVectorStore:
             index_name=self.index_name,
             vector_count=self.count,
             dimensions=self.dimensions,
+            embedding_model=self.embedding_model,
             metadata_count=len(self._records),
         )
 
