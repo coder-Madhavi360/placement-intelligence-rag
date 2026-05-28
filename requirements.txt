@@ -1,12 +1,24 @@
 fastapi==0.115.6
-uvicorn[standard]==0.34.0
+uvicorn[standard]==0.32.1
 pydantic==2.10.4
 pydantic-settings==2.7.0
+
 python-multipart==0.0.20
 
-# Optional production integrations. Install the provider you choose and add an
-# adapter under backend/app/vectorstores or backend/app/embeddings.
-# qdrant-client==1.12.1
-# pinecone-client==5.0.1
-# weaviate-client==4.9.6
-# openai==1.58.1
+pdfplumber==0.11.5
+pypdf==5.1.0
+
+sentence-transformers==3.3.1
+faiss-cpu==1.9.0.post1
+
+numpy==2.2.1
+pandas==2.2.3
+
+scikit-learn==1.6.0
+
+httpx==0.28.1
+
+python-dotenv==1.0.1
+
+rich==13.9.4
+loguru==0.7.3
