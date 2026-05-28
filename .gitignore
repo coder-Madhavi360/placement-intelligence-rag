@@ -1,0 +1,17 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+data/raw/
+data/processed/
+data/vectorstores/
+
+.DS_Store
+Thumbs.db
