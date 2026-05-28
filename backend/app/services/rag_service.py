@@ -2,6 +2,7 @@ import logging
 import time
 
 from app.core.config import Settings
+from app.chat.chat_models import ChatMessage
 from app.retrieval.search_models import RetrievalQueryRequest
 from app.schemas.rag import RAGQueryRequest, RAGQueryResponse
 from app.schemas.rag import RetrievedContext
@@ -29,7 +30,12 @@ class RAGService:
         self.retrieval_service = retrieval_service
         self.llm_service = llm_service
 
-    async def answer(self, request: RAGQueryRequest) -> RAGQueryResponse:
+    async def answer(
+        self,
+        request: RAGQueryRequest,
+        *,
+        conversation_history: list[ChatMessage] | None = None,
+    ) -> RAGQueryResponse:
         """Retrieve relevant chunks, generate an answer, and return sources."""
         top_k = request.top_k or self.settings.max_retrieval_results
         logger.info(
@@ -72,7 +78,11 @@ class RAGService:
             retrieval_time_ms,
         )
 
-        generated = self.llm_service.generate(request.query, contexts)
+        generated = self.llm_service.generate(
+            request.query,
+            contexts,
+            conversation_history=conversation_history,
+        )
         logger.info(
             "RAG answer generated: model=%s generation_time_ms=%s prompt_token_estimate=%s sources=%s",
             generated.model,

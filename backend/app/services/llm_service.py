@@ -12,6 +12,7 @@ except ImportError:  # pragma: no cover - exercised only when optional SDK is ab
     OpenAIError = Exception
 
 from app.core.config import Settings
+from app.chat.chat_models import ChatMessage
 from app.schemas.rag import RetrievedContext
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,9 @@ If answer is unavailable, say:
 
 USER_PROMPT_TEMPLATE = """USER QUESTION:
 {query}
+
+RECENT CONVERSATION:
+{conversation_history}
 
 RETRIEVED CONTEXT:
 {chunks}
@@ -48,16 +52,25 @@ class LLMService:
         self.model = settings.llm_model
         self._client: OpenAI | None = None
 
-    def generate(self, query: str, contexts: list[RetrievedContext]) -> GeneratedAnswer:
+    def generate(
+        self,
+        query: str,
+        contexts: list[RetrievedContext],
+        *,
+        conversation_history: list[ChatMessage] | None = None,
+    ) -> GeneratedAnswer:
+        """Generate a grounded answer with optional recent conversation context."""
         started_at = time.perf_counter()
         chunks = self._format_contexts(contexts)
-        prompt = USER_PROMPT_TEMPLATE.format(query=query, chunks=chunks)
+        history = self._format_conversation_history(conversation_history or [])
+        prompt = USER_PROMPT_TEMPLATE.format(query=query, conversation_history=history, chunks=chunks)
         prompt_token_estimate = self._estimate_tokens(SYSTEM_PROMPT + prompt)
 
         logger.info(
-            "Starting answer generation: model=%s context_count=%s prompt_token_estimate=%s",
+            "Starting answer generation: model=%s context_count=%s history_messages=%s prompt_token_estimate=%s",
             self.effective_model,
             len(contexts),
+            len(conversation_history or []),
             prompt_token_estimate,
         )
 
@@ -127,6 +140,15 @@ class LLMService:
                 f"Content:\n{context.content}"
             )
         return "\n\n".join(formatted)
+
+    def _format_conversation_history(self, messages: list[ChatMessage]) -> str:
+        if not messages:
+            return "No previous conversation."
+
+        return "\n".join(
+            f"{message.role.value.upper()} [{message.timestamp.isoformat()}]: {message.content}"
+            for message in messages
+        )
 
     def _fallback_answer(self, query: str, contexts: list[RetrievedContext]) -> str:
         """Deterministic grounded fallback used when no OpenAI key is configured."""

@@ -2,6 +2,8 @@ from functools import lru_cache
 
 from fastapi import Depends
 
+from app.chat.conversation_manager import ConversationManager
+from app.chat.memory_store import InMemoryConversationStore
 from app.core.config import Settings, get_settings
 from app.core.exceptions import ServiceUnavailableError
 from app.chunking.chunk_models import ChunkingConfig
@@ -10,6 +12,7 @@ from app.embeddings.embedder import SentenceTransformerEmbedder
 from app.embeddings.local import LocalEmbeddingProvider
 from app.embeddings.vector_models import EmbeddingConfig
 from app.retrieval.retriever import Retriever
+from app.services.chat_service import ChatService
 from app.services.document_service import DocumentService
 from app.services.llm_service import LLMService
 from app.services.rag_service import RAGService
@@ -117,3 +120,22 @@ def get_rag_service(
     llm_service: LLMService = Depends(get_llm_service),
 ) -> RAGService:
     return RAGService(settings=settings, retrieval_service=retrieval_service, llm_service=llm_service)
+
+
+@lru_cache
+def get_conversation_store() -> InMemoryConversationStore:
+    """Create process-local chat memory storage."""
+    return InMemoryConversationStore()
+
+
+@lru_cache
+def get_conversation_manager() -> ConversationManager:
+    """Create the chat conversation manager once per process."""
+    return ConversationManager(store=get_conversation_store(), memory_window_conversations=5)
+
+
+def get_chat_service(
+    conversation_manager: ConversationManager = Depends(get_conversation_manager),
+    rag_service: RAGService = Depends(get_rag_service),
+) -> ChatService:
+    return ChatService(conversation_manager=conversation_manager, rag_service=rag_service)
