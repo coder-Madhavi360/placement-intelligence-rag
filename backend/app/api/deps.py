@@ -10,6 +10,7 @@ from app.embeddings.local import LocalEmbeddingProvider
 from app.embeddings.vector_models import EmbeddingConfig
 from app.retrieval.retriever import Retriever
 from app.services.document_service import DocumentService
+from app.services.llm_service import LLMService
 from app.services.rag_service import RAGService
 from app.services.retrieval_service import RetrievalService
 from app.vectorstores.base import VectorStore
@@ -120,8 +121,13 @@ def get_retrieval_service(
     return RetrievalService(embedder=embedder, store=store)
 
 
+def get_llm_service(settings: Settings = Depends(get_settings)) -> LLMService:
+    return LLMService(settings=settings)
+
+
 def get_rag_service(
     settings: Settings = Depends(get_settings),
     retrieval_service: RetrievalService = Depends(get_retrieval_service),
+    llm_service: LLMService = Depends(get_llm_service),
 ) -> RAGService:
-    return RAGService(settings=settings, retrieval_service=retrieval_service)
+    return RAGService(settings=settings, retrieval_service=retrieval_service, llm_service=llm_service)

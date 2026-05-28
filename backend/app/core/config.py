@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -45,9 +45,17 @@ class Settings(BaseSettings):
     weaviate_url: str | None = None
     weaviate_api_key: str | None = None
 
-    llm_provider: Literal["stub", "openai", "anthropic", "local"] = "stub"
-    llm_model: str = "stub"
-    openai_api_key: str | None = None
+    llm_provider: Literal["stub", "openai", "anthropic", "local"] = "openai"
+    llm_model: str = Field(
+        default="gpt-4o-mini",
+        validation_alias=AliasChoices("RAG_LLM_MODEL", "LLM_MODEL"),
+    )
+    openai_api_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("RAG_OPENAI_API_KEY", "OPENAI_API_KEY"),
+    )
+    llm_temperature: float = 0.0
+    llm_max_output_tokens: int = 500
 
     max_retrieval_results: int = 5
 

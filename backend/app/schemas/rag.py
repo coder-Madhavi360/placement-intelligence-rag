@@ -21,4 +21,7 @@ class RetrievedContext(BaseModel):
 class RAGQueryResponse(BaseModel):
     answer: str
     contexts: list[RetrievedContext] = Field(default_factory=list)
+    sources: list[str] = Field(default_factory=list)
     model: str
+    retrieval_time_ms: int = 0
+    generation_time_ms: int = 0

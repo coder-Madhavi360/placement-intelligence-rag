@@ -2,23 +2,24 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.api.deps import get_retrieval_service
-from app.retrieval.search_models import RetrievalQueryRequest, RetrievalResponse
-from app.services.retrieval_service import RetrievalService, RetrievalServiceError
+from app.api.deps import get_rag_service
+from app.schemas.rag import RAGQueryRequest, RAGQueryResponse
+from app.services.rag_service import RAGService
+from app.services.retrieval_service import RetrievalServiceError
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.post("/query", response_model=RetrievalResponse)
+@router.post("/query", response_model=RAGQueryResponse)
 async def query_rag(
-    payload: RetrievalQueryRequest,
-    retrieval_service: RetrievalService = Depends(get_retrieval_service),
-) -> RetrievalResponse:
-    """Retrieve top-k semantically relevant chunks from the FAISS RAG index."""
+    payload: RAGQueryRequest,
+    rag_service: RAGService = Depends(get_rag_service),
+) -> RAGQueryResponse:
+    """Retrieve context and generate a grounded placement intelligence answer."""
     try:
-        return await retrieval_service.query(payload)
+        return await rag_service.answer(payload)
     except RetrievalServiceError as exc:
         logger.exception("RAG retrieval endpoint failed")
         raise HTTPException(
