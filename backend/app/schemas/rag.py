@@ -4,13 +4,17 @@ from app.schemas.common import Metadata, Modality
 
 
 class RAGQueryRequest(BaseModel):
-    query: str = Field(min_length=1)
+    """Client request for grounded placement-intelligence answers."""
+
+    query: str = Field(min_length=1, max_length=4000)
     modality: Modality = Modality.TEXT
-    top_k: int = Field(default=5, ge=1, le=25)
+    top_k: int | None = Field(default=None, ge=1, le=25)
     filters: dict[str, str | int | float | bool] = Field(default_factory=dict)
 
 
 class RetrievedContext(BaseModel):
+    """Context chunk used to ground the generated answer."""
+
     id: str
     content: str
     score: float
@@ -19,6 +23,8 @@ class RetrievedContext(BaseModel):
 
 
 class RAGQueryResponse(BaseModel):
+    """Answer payload returned by the RAG query endpoint."""
+
     answer: str
     contexts: list[RetrievedContext] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)

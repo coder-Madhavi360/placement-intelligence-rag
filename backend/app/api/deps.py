@@ -1,9 +1,10 @@
 from functools import lru_cache
-from pathlib import Path
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 
 from app.core.config import Settings, get_settings
+from app.core.exceptions import ServiceUnavailableError
+from app.chunking.chunk_models import ChunkingConfig
 from app.embeddings.base import EmbeddingProvider
 from app.embeddings.embedder import SentenceTransformerEmbedder
 from app.embeddings.local import LocalEmbeddingProvider
@@ -16,21 +17,6 @@ from app.services.retrieval_service import RetrievalService
 from app.vectorstores.base import VectorStore
 from app.vectorstores.faiss_store import FAISSStoreError, FAISSVectorStore
 from app.vectorstores.factory import build_vector_store
-
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
-
-def _resolve_project_path(path: Path) -> Path:
-    """Resolve relative runtime paths from either the process cwd or repo root."""
-    if path.is_absolute():
-        return path
-
-    cwd_path = (Path.cwd() / path).resolve()
-    if cwd_path.exists():
-        return cwd_path
-
-    return (PROJECT_ROOT / path).resolve()
 
 
 @lru_cache
@@ -57,8 +43,17 @@ def get_sentence_transformer_embedder() -> SentenceTransformerEmbedder:
             dimensions=settings.embedding_dimensions,
             batch_size=settings.embedding_batch_size,
             cache_enabled=True,
-            cache_path=_resolve_project_path(settings.embedding_cache_path),
+            cache_path=settings.resolve_path(settings.embedding_cache_path),
         )
+    )
+
+
+def get_chunking_config(settings: Settings = Depends(get_settings)) -> ChunkingConfig:
+    """Build chunking configuration from environment settings."""
+    return ChunkingConfig(
+        max_tokens=settings.chunk_max_tokens,
+        overlap_tokens=settings.chunk_overlap_tokens,
+        min_chunk_tokens=settings.chunk_min_tokens,
     )
 
 
@@ -66,35 +61,26 @@ def get_sentence_transformer_embedder() -> SentenceTransformerEmbedder:
 def get_faiss_store() -> FAISSVectorStore:
     """Load the persisted FAISS index and metadata sidecar."""
     settings = get_settings()
-    index_path = _resolve_project_path(settings.faiss_index_path)
-    metadata_path = _resolve_project_path(settings.faiss_metadata_path)
+    index_path = settings.resolve_path(settings.faiss_index_path)
+    metadata_path = settings.resolve_path(settings.faiss_metadata_path)
     try:
         store = FAISSVectorStore.load(index_path=index_path, metadata_path=metadata_path)
     except FAISSStoreError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=(
-                "FAISS retrieval index is unavailable. Build it with "
-                "scripts/test_embeddings.py or your indexing job before querying. "
-                f"index_path={index_path} metadata_path={metadata_path}"
-            ),
+        raise ServiceUnavailableError(
+            "FAISS retrieval index is unavailable. Build it with "
+            "scripts/test_embeddings.py or your indexing job before querying. "
+            f"index_path={index_path} metadata_path={metadata_path}"
         ) from exc
 
     if store.dimensions != settings.embedding_dimensions:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=(
-                "FAISS index dimensions do not match embedding configuration. "
-                f"index_dimensions={store.dimensions} configured_dimensions={settings.embedding_dimensions}"
-            ),
+        raise ServiceUnavailableError(
+            "FAISS index dimensions do not match embedding configuration. "
+            f"index_dimensions={store.dimensions} configured_dimensions={settings.embedding_dimensions}"
         )
     if store.embedding_model and store.embedding_model != settings.embedding_model:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=(
-                "FAISS index embedding model does not match query embedding model. "
-                f"index_model={store.embedding_model} configured_model={settings.embedding_model}"
-            ),
+        raise ServiceUnavailableError(
+            "FAISS index embedding model does not match query embedding model. "
+            f"index_model={store.embedding_model} configured_model={settings.embedding_model}"
         )
 
     return store

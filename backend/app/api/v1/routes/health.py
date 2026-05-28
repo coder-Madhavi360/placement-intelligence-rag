@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.config import Settings, get_settings
-from app.schemas.health import HealthResponse
+from app.schemas.health import HealthResponse, VersionResponse
 
 router = APIRouter()
 
@@ -13,4 +13,16 @@ async def health_check(settings: Settings = Depends(get_settings)) -> HealthResp
         status="ok",
         app_name=settings.app_name,
         environment=settings.environment,
+        version=settings.app_version,
+    )
+
+
+@router.get("/version", response_model=VersionResponse)
+async def version(settings: Settings = Depends(get_settings)) -> VersionResponse:
+    """Return app version and runtime environment metadata."""
+    return VersionResponse(
+        app_name=settings.app_name,
+        version=settings.app_version,
+        environment=settings.environment,
+        api_prefix=settings.api_v1_prefix,
     )

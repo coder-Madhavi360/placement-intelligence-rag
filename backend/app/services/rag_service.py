@@ -30,9 +30,11 @@ class RAGService:
         self.llm_service = llm_service
 
     async def answer(self, request: RAGQueryRequest) -> RAGQueryResponse:
+        """Retrieve relevant chunks, generate an answer, and return sources."""
+        top_k = request.top_k or self.settings.max_retrieval_results
         logger.info(
             "RAG query received on legacy response endpoint: top_k=%s filters=%s model=%s",
-            request.top_k,
+            top_k,
             request.filters,
             self.settings.embedding_model,
         )
@@ -42,7 +44,7 @@ class RAGService:
             retrieval_response = await self.retrieval_service.query(
                 RetrievalQueryRequest(
                     query=request.query,
-                    top_k=request.top_k,
+                    top_k=top_k,
                     filters=request.filters,
                 )
             )

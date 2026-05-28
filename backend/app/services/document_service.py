@@ -1,6 +1,10 @@
+import logging
+
 from app.embeddings.base import EmbeddingProvider
 from app.schemas.documents import DocumentChunk, IngestResult
 from app.vectorstores.base import VectorRecord, VectorStore
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentService:
@@ -11,9 +15,18 @@ class DocumentService:
         self.vector_store = vector_store
 
     async def ingest(self, documents: list[DocumentChunk]) -> IngestResult:
+        """Embed validated document chunks and upsert them into the vector store."""
+        logger.info("Starting document ingestion: documents=%s", len(documents))
         records: list[VectorRecord] = []
 
         for document in documents:
+            logger.info(
+                "Embedding document chunk: id=%s modality=%s source=%s page=%s",
+                document.id,
+                document.modality,
+                document.metadata.source,
+                document.metadata.page,
+            )
             if document.modality.value == "image":
                 vector = await self.embedding_provider.embed_image(document.content)
             else:
@@ -30,4 +43,5 @@ class DocumentService:
             )
 
         indexed_count = await self.vector_store.upsert(records)
+        logger.info("Completed document ingestion: indexed_count=%s", indexed_count)
         return IngestResult(indexed_count=indexed_count)
