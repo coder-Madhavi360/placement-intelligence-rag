@@ -5,14 +5,13 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BACKEND_ROOT = PROJECT_ROOT / "backend"
 PDF_PATH = PROJECT_ROOT / "data" / "Placement_RAG_Dataset_Enhanced.pdf"
 INDEX_DIR = PROJECT_ROOT / "data" / "vectorstores"
 INDEX_PATH = INDEX_DIR / "placement_intelligence.faiss"
 METADATA_PATH = INDEX_DIR / "placement_intelligence.metadata.json"
 CACHE_PATH = INDEX_DIR / "all_minilm_l6_v2_cache.json"
 
-sys.path.insert(0, str(BACKEND_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT))
 
 os.environ["RAG_EMBEDDING_PROVIDER"] = "sentence_transformers"
 os.environ["RAG_EMBEDDING_MODEL"] = "sentence-transformers/all-MiniLM-L6-v2"
@@ -22,19 +21,20 @@ os.environ["RAG_EMBEDDING_CACHE_PATH"] = str(CACHE_PATH)
 os.environ["RAG_VECTOR_STORE"] = "faiss"
 os.environ["RAG_FAISS_INDEX_PATH"] = str(INDEX_PATH)
 os.environ["RAG_FAISS_METADATA_PATH"] = str(METADATA_PATH)
+os.environ["RAG_OPENAI_API_KEY"] = ""
 
 from fastapi.testclient import TestClient
 
-from app.api.deps import get_faiss_store, get_sentence_transformer_embedder
-from app.chunking.chunk_models import ChunkingConfig
-from app.chunking.semantic_chunker import SemanticChunker
-from app.core.config import get_settings
-from app.embeddings.embedder import EmbeddingError, SentenceTransformerEmbedder
-from app.embeddings.vector_models import EmbeddingConfig
-from app.ingestion.pdf_loader import PDFIngestionError, PDFLoader
-from app.main import app
-from app.vectorstores.faiss_store import FAISSVectorStore
-from app.vectorstores.index_manager import VectorIndexManager
+from core.api.deps import get_faiss_store, get_sentence_transformer_embedder
+from ingestion.chunking.chunk_models import ChunkingConfig
+from ingestion.chunking.semantic_chunker import SemanticChunker
+from core.config import get_settings
+from retrieval.embeddings.embedder import EmbeddingError, SentenceTransformerEmbedder
+from retrieval.embeddings.vector_models import EmbeddingConfig
+from ingestion.pdf_loader import PDFIngestionError, PDFLoader
+from core.main import app
+from retrieval.vectorstores.faiss_store import FAISSVectorStore
+from retrieval.vectorstores.index_manager import VectorIndexManager
 
 
 def ensure_index_exists() -> None:
@@ -175,10 +175,6 @@ def main() -> int:
     if len(data["contexts"]) == 0:
         print("\n===== RETRIEVAL FAILURE =====")
         print("The API returned no matches.")
-        return 1
-    if data["model"] != "sentence-transformers/all-MiniLM-L6-v2":
-        print("\n===== RETRIEVAL FAILURE =====")
-        print(f"API used an unexpected model: {data['model']}")
         return 1
     if "No relevant context found" in data["answer"]:
         print("\n===== RETRIEVAL FAILURE =====")

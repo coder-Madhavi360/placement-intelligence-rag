@@ -3,22 +3,21 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BACKEND_ROOT = PROJECT_ROOT / "backend"
 PDF_PATH = PROJECT_ROOT / "data" / "Placement_RAG_Dataset_Enhanced.pdf"
 INDEX_DIR = PROJECT_ROOT / "data" / "vectorstores"
 INDEX_PATH = INDEX_DIR / "placement_intelligence.faiss"
 METADATA_PATH = INDEX_DIR / "placement_intelligence.metadata.json"
 CACHE_PATH = INDEX_DIR / "all_minilm_l6_v2_cache.json"
 
-sys.path.insert(0, str(BACKEND_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from app.chunking.chunk_models import ChunkingConfig
-from app.chunking.semantic_chunker import SemanticChunker
-from app.embeddings.embedder import EmbeddingError, SentenceTransformerEmbedder
-from app.embeddings.vector_models import EmbeddingConfig
-from app.ingestion.pdf_loader import PDFIngestionError, PDFLoader
-from app.vectorstores.index_manager import VectorIndexManager
-from app.vectorstores.search import SemanticSearchService
+from ingestion.chunking.chunk_models import ChunkingConfig
+from ingestion.chunking.semantic_chunker import SemanticChunker
+from retrieval.embeddings.embedder import EmbeddingError, SentenceTransformerEmbedder
+from retrieval.embeddings.vector_models import EmbeddingConfig
+from ingestion.pdf_loader import PDFIngestionError, PDFLoader
+from retrieval.vectorstores.index_manager import VectorIndexManager
+from retrieval.vectorstores.search import SemanticSearchService
 
 
 def main() -> int:
@@ -120,3 +119,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
