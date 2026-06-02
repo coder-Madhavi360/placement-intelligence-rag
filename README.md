@@ -1,61 +1,51 @@
 # Placement Intelligence RAG
 
-Production-ready FastAPI backend for answering placement-intelligence questions from an ingested PDF knowledge base. The system extracts PDF content, chunks it semantically, embeds chunks, stores vectors in FAISS, retrieves relevant evidence, and generates grounded answers with an LLM fallback path.
+Placement Intelligence RAG answers placement-related questions from the bundled PDF knowledge base. It preserves the existing ingestion, semantic chunking, FAISS retrieval, reranking, grounded LLM generation, conversational memory, FastAPI endpoints, and evaluation scripts in a flatter production layout.
 
-## Architecture Overview
+## Architecture
 
 ```text
-PDF dataset
-  -> PDFLoader / MetadataBuilder
-  -> SemanticChunker
+placement-rag/
+├── README.md
+├── requirements.txt
+├── .env.example
+├── .gitignore
+├── version.py
+├── app.py
+├── core/
+├── ingestion/
+├── retrieval/
+├── generation/
+├── safety/
+├── tools/
+├── evaluation/
+├── feedback/
+├── scripts/
+└── data/
+```
+
+Runtime flow:
+
+```text
+PDFLoader
+  -> SemanticChunker + deduplication
   -> SentenceTransformerEmbedder
   -> FAISSVectorStore
   -> RetrievalService + RetrievalRanker
   -> LLMService
-  -> FastAPI response
+  -> FastAPI / Streamlit responses
 ```
 
-The backend is layered so HTTP code stays thin and business logic stays testable:
+## Key Modules
 
-- API routes validate requests and delegate to services.
-- Services coordinate ingestion, retrieval, and answer generation.
-- Retrieval modules handle query embedding, FAISS search, ranking, and score metadata.
-- Embedding modules isolate model loading, batching, and cache behavior.
-- Vector store adapters hide storage implementation details.
-- Core modules own environment settings, logging, middleware, and exception handling.
-
-## Folder Structure
-
-```text
-backend/
-  main.py                    # ASGI import compatibility: backend.main:app
-  app/
-    main.py                  # FastAPI app factory and middleware
-    api/
-      deps.py                # Dependency injection providers
-      v1/
-        router.py            # Versioned API composition
-        routes/              # Current route handlers
-        endpoints/           # Backward-compatible legacy route module
-    chunking/                # Semantic chunking and deduplication
-    core/
-      config.py              # Environment settings
-      exceptions.py          # Centralized API exception handling
-      logging.py             # Text/JSON logging setup
-      middleware.py          # Request logging middleware
-    embeddings/              # Embedding provider interfaces/adapters
-    ingestion/               # PDF extraction, cleaning, table parsing, metadata
-    retrieval/               # Retrieval orchestration and ranking
-    schemas/                 # Pydantic request/response contracts
-    services/                # Business workflows
-    vectorstores/            # Vector database interfaces/adapters
-data/
-  Placement_RAG_Dataset_Enhanced.pdf
-scripts/
-  test_embeddings.py         # Build and persist the FAISS index
-  test_retrieval.py          # Validate retrieval behavior
-  test_llm_pipeline.py       # Validate grounded answer generation
-```
+- `core/`: FastAPI app factory, API routes, dependency injection, settings, logging, middleware, exceptions, and schemas.
+- `ingestion/`: PDF loading, text cleaning, table extraction, metadata, document ingestion, and semantic chunking.
+- `retrieval/`: embedding providers, FAISS vector store, index management, retrieval service, retriever, and reranker.
+- `generation/`: grounded RAG orchestration and LLM answer generation with fallback behavior.
+- `feedback/`: chat request/response models, conversation manager, in-memory chat store, and session-aware chat service.
+- `evaluation/`: runnable validation scripts for ingestion, chunking, embeddings, retrieval, LLM pipeline, and chat memory.
+- `app.py`: Streamlit chat frontend that calls the FastAPI `/api/v1/chat` endpoint.
+- `data/`: source PDF and preserved FAISS artifacts under `data/vectorstores/`.
 
 ## Setup
 
@@ -66,90 +56,98 @@ pip install -r requirements.txt
 copy .env.example .env
 ```
 
-Configure `.env`:
+Configure `.env` as needed:
 
 ```env
-RAG_OPENAI_API_KEY=your_openai_key
-RAG_LLM_MODEL=gpt-4o-mini
+RAG_VECTOR_STORE=faiss
 RAG_FAISS_INDEX_PATH=data/vectorstores/placement_intelligence.faiss
 RAG_FAISS_METADATA_PATH=data/vectorstores/placement_intelligence.metadata.json
-RAG_CHUNK_MAX_TOKENS=260
-RAG_MAX_RETRIEVAL_RESULTS=5
+RAG_EMBEDDING_CACHE_PATH=data/vectorstores/all_minilm_l6_v2_cache.json
+RAG_OPENAI_API_KEY=
+RAG_LLM_MODEL=gpt-4o-mini
 ```
 
-Build the local FAISS index:
+## Run
+
+Start the FastAPI backend:
 
 ```bash
-python scripts/test_embeddings.py
+uvicorn core.main:app --reload
 ```
 
-Run the API:
+Start the Streamlit frontend in a second terminal:
 
 ```bash
-uvicorn backend.main:app --reload
+streamlit run app.py
 ```
 
-Open:
+Useful URLs:
 
-- API docs: `http://127.0.0.1:8000/docs`
+- FastAPI docs: `http://127.0.0.1:8000/docs`
 - Health: `http://127.0.0.1:8000/api/v1/health`
 - Version: `http://127.0.0.1:8000/api/v1/version`
+- Streamlit: `http://localhost:8501`
 
-## API Usage
+## API Examples
+
+Query RAG:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/query ^
+  -H "Content-Type: application/json" ^
+  -d "{\"query\":\"What is Amazon eligibility criteria?\",\"top_k\":5}"
+```
+
+Conversational chat with memory:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/chat ^
+  -H "Content-Type: application/json" ^
+  -d "{\"query\":\"Which companies allow one backlog?\"}"
+```
 
 Ingest documents:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/ingest ^
   -H "Content-Type: application/json" ^
-  -d "{\"documents\":[{\"id\":\"doc-1\",\"content\":\"Campus placement preparation includes aptitude, coding, projects, and interview practice.\",\"modality\":\"text\",\"metadata\":{\"source\":\"starter\"}}]}"
+  -d "{\"documents\":[{\"id\":\"doc-1\",\"content\":\"Placement preparation includes aptitude, coding, projects, and interview practice.\",\"modality\":\"text\",\"metadata\":{\"source\":\"manual\"}}]}"
 ```
 
-Query the index:
+## Evaluation
+
+Run the validation scripts from the project root:
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/v1/query ^
-  -H "Content-Type: application/json" ^
-  -d "{\"query\":\"How should I prepare for placements?\",\"top_k\":3}"
+python evaluation/test_ingestion.py
+python evaluation/test_chunking.py
+python evaluation/test_embeddings.py
+python evaluation/test_retrieval.py
+python evaluation/test_llm_pipeline.py
+python evaluation/test_chat_memory.py
 ```
 
-Legacy-compatible RAG query endpoint:
+`evaluation/test_embeddings.py` rebuilds and persists the FAISS index when needed. Existing FAISS files remain in `data/vectorstores/`.
 
-```bash
-curl -X POST http://127.0.0.1:8000/api/v1/rag/query ^
-  -H "Content-Type: application/json" ^
-  -d "{\"query\":\"What is Amazon eligibility criteria?\"}"
-```
+## Migration Summary
 
-## Sample Queries
+| Old path | New path |
+| --- | --- |
+| `backend/app/main.py` | `core/main.py` |
+| `backend/app/core/*` | `core/*` |
+| `backend/app/api/*` | `core/api/*` |
+| `backend/app/schemas/*` | `core/schemas/*` |
+| `backend/app/ingestion/*` | `ingestion/*` |
+| `backend/app/ingestion/chunking/*` | `ingestion/chunking/*` |
+| `backend/app/retrieval/*` | `retrieval/*` |
+| `backend/app/retrieval/embeddings/*` | `retrieval/embeddings/*` |
+| `backend/app/retrieval/vectorstores/*` | `retrieval/vectorstores/*` |
+| `backend/app/generation/*` | `generation/*` |
+| `backend/app/feedback/*` | `feedback/*` |
+| `backend/app/safety/*` | `safety/*` |
+| `backend/app/tools/*` | `tools/*` |
+| `scripts/test_*.py` | `evaluation/test_*.py` |
+| `frontend/app.py` | `app.py` |
+| `backend.main:app` | `core.main:app` |
 
-- `Which companies allow backlogs and offer a high package?`
-- `What is Amazon eligibility criteria?`
-- `Which companies are suitable for students with 7 CGPA?`
-- `Summarize placement preparation advice from the dataset.`
-- `Which roles mention coding or aptitude rounds?`
-
-## Screenshots
-
-Add screenshots before sharing or presenting:
-
-- `docs/screenshots/swagger-ui.png` - FastAPI Swagger UI
-- `docs/screenshots/query-response.png` - Sample RAG response
-- `docs/screenshots/retrieval-logs.png` - Retrieval and answer-generation logs
-
-## Production Notes
-
-- Centralized exception handlers return a consistent error shape.
-- Request, ingestion, retrieval, embedding, FAISS, and LLM paths emit structured logs.
-- Startup validation warns when OpenAI or FAISS runtime prerequisites are missing.
-- Environment variables use the `RAG_` prefix to avoid deployment collisions.
-- The answer generator falls back to deterministic grounded output if OpenAI is unavailable.
-
-## Future Improvements
-
-- Add authentication, rate limiting, and per-request correlation IDs.
-- Move PDF ingestion and index building to a background worker.
-- Add CI with unit tests, integration tests, linting, and type checks.
-- Add observability with OpenTelemetry traces and metrics.
-- Add hosted vector database adapters for Qdrant, Pinecone, or Weaviate.
-- Add an evaluation set for retrieval quality and hallucination checks.
+Obsolete duplicate `backend/`, `frontend/`, and generated cache directories were removed after their implementations were moved.
