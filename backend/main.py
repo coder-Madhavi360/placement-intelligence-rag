@@ -1,3 +1,3 @@
-from app.main import app
+from core.main import app
 
 __all__ = ["app"]

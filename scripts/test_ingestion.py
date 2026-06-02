@@ -3,12 +3,11 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BACKEND_ROOT = PROJECT_ROOT / "backend"
 PDF_PATH = PROJECT_ROOT / "data" / "Placement_RAG_Dataset_Enhanced.pdf"
 
-sys.path.insert(0, str(BACKEND_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from app.ingestion.pdf_loader import PDFIngestionError, PDFLoader
+from ingestion.pdf_loader import PDFIngestionError, PDFLoader
 
 
 def main() -> int:
@@ -74,3 +73,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+

@@ -4,15 +4,14 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BACKEND_ROOT = PROJECT_ROOT / "backend"
-sys.path.insert(0, str(BACKEND_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT))
 
-from app.api.deps import get_chat_service
-from app.chat.conversation_manager import ConversationManager
-from app.chat.memory_store import InMemoryConversationStore
-from app.main import app
-from app.schemas.rag import RAGQueryResponse
-from app.services.chat_service import ChatService
+from core.api.deps import get_chat_service
+from feedback.chat.conversation_manager import ConversationManager
+from feedback.chat.memory_store import InMemoryConversationStore
+from core.main import app
+from core.schemas.rag import RAGQueryResponse
+from feedback.chat_service import ChatService
 
 
 class FakeRAGService:
@@ -70,3 +69,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+

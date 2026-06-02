@@ -4,13 +4,12 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-BACKEND_ROOT = PROJECT_ROOT / "backend"
 INDEX_DIR = PROJECT_ROOT / "data" / "vectorstores"
 INDEX_PATH = INDEX_DIR / "placement_intelligence.faiss"
 METADATA_PATH = INDEX_DIR / "placement_intelligence.metadata.json"
 CACHE_PATH = INDEX_DIR / "all_minilm_l6_v2_cache.json"
 
-sys.path.insert(0, str(BACKEND_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT))
 
 os.environ["RAG_EMBEDDING_PROVIDER"] = "sentence_transformers"
 os.environ["RAG_EMBEDDING_MODEL"] = "sentence-transformers/all-MiniLM-L6-v2"
@@ -25,9 +24,9 @@ os.environ["RAG_OPENAI_API_KEY"] = ""
 
 from fastapi.testclient import TestClient
 
-from app.api.deps import get_faiss_store, get_sentence_transformer_embedder
-from app.core.config import get_settings
-from app.main import app
+from core.api.deps import get_faiss_store, get_sentence_transformer_embedder
+from core.config import get_settings
+from core.main import app
 
 
 def clear_runtime_caches() -> None:
@@ -111,3 +110,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
