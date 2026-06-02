@@ -12,8 +12,6 @@ placement-rag/
   .gitignore
   version.py
   app.py                         # Streamlit frontend
-  backend/
-    main.py                      # compatibility ASGI shim to core.main:app
   core/                          # FastAPI app, API routes, config, schemas, errors, logging
   ingestion/                     # PDF loading, text/table extraction, semantic chunking, document ingestion
   retrieval/                     # embeddings, FAISS/vector stores, search, ranking, retrieval service
@@ -77,12 +75,6 @@ FastAPI:
 
 ```bash
 uvicorn core.main:app --reload
-```
-
-Compatibility entrypoint:
-
-```bash
-uvicorn backend.main:app --reload
 ```
 
 Streamlit frontend:

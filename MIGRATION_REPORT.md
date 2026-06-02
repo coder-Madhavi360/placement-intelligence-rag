@@ -1,24 +1,35 @@
 # Migration Report
 
-| Old path | New path |
-|---|---|
-| `backend/app/main.py` | `core/main.py` |
-| `backend/app/api/` | `core/api/` |
-| `backend/app/core/` | `core/` |
-| `backend/app/schemas/` | `core/schemas/` |
-| `backend/app/ingestion/` | `ingestion/` |
-| `backend/app/chunking/` | `ingestion/chunking/` |
-| `backend/app/embeddings/` | `retrieval/embeddings/` |
-| `backend/app/vectorstores/` | `retrieval/vectorstores/` |
-| `backend/app/retrieval/` | `retrieval/` |
-| `backend/app/services/retrieval_service.py` | `retrieval/service.py` |
-| `backend/app/services/document_service.py` | `ingestion/service.py` |
-| `backend/app/services/llm_service.py` | `generation/llm_service.py` |
-| `backend/app/services/rag_service.py` | `generation/rag_service.py` |
-| `backend/app/services/chat_service.py` | `feedback/chat_service.py` |
-| `backend/app/chat/` | `feedback/chat/` |
-| `backend/main.py` | `backend/main.py` compatibility shim to `core.main:app` |
-| missing root Streamlit app | `app.py` |
-| missing version module | `version.py` |
+The repository now uses the target top-level package structure.
 
-Unused duplicate folders under `backend/app/` were removed after their modules were moved.
+| Current path | Final path | Status |
+|---|---|---|
+| `app.py` | `app.py` | Streamlit entrypoint preserved |
+| `version.py` | `version.py` | Version metadata preserved |
+| `core/` | `core/` | FastAPI app, API routes, config, schemas, errors, logging preserved |
+| `ingestion/` | `ingestion/` | PDF loading, cleaning, metadata, table extraction, chunking preserved |
+| `retrieval/` | `retrieval/` | Embeddings, vector stores, ranking, retrieval service preserved |
+| `generation/` | `generation/` | LLM and RAG services preserved |
+| `safety/` | `safety/` | Package boundary preserved |
+| `tools/` | `tools/` | Package boundary preserved |
+| `evaluation/` | `evaluation/` | Package boundary preserved |
+| `feedback/` | `feedback/` | Chat memory and chat service preserved |
+| `scripts/` | `scripts/` | Verification scripts preserved |
+| `data/` | `data/` | Dataset and retrieval artifacts preserved |
+| `backend/main.py` | removed | Compatibility shim removed; use `core.main:app` |
+
+## Import Changes
+
+No business-logic imports were changed. The supported FastAPI entrypoint is:
+
+```bash
+uvicorn core.main:app --reload
+```
+
+The removed compatibility import was:
+
+```python
+from core.main import app
+```
+
+from `backend/main.py`.
