@@ -24,6 +24,7 @@ from safety.conflict_detector import PlacementConflictDetector
 from safety.fallback_guard import FallbackGuard
 from safety.overshadow_limiter import OvershadowLimiter
 from feedback.loop import FeedbackLoop
+from feedback.storage import save_feedback
 
 logging.basicConfig(level=logging.WARNING)
 
