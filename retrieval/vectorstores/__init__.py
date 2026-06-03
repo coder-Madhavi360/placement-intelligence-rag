@@ -1,2 +1,0 @@
-"""Vector database adapters."""
-
