@@ -320,7 +320,7 @@ def load_pipeline():
     generator         = GroqGenerator()
     conflict_detector = PlacementConflictDetector()
     fallback_guard    = FallbackGuard()
-    feedback          = FeedbackLoop()
+    feedback          = FeedbackLoop(limiter)
     pipeline          = RAGPipeline(
         retriever, reranker, refiner, prompt_builder,
         generator, conflict_detector, fallback_guard,
@@ -513,7 +513,15 @@ else:
             f'<div class="chat-a"><div class="{css_class}">{answer_html}</div></div>',
             unsafe_allow_html=True,
         )
+ # Feedback buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("👍 Helpful", key=f"good_{item['query']}"):
+                st.success("Thank you for your feedback!")
 
+        with col2:
+            if st.button("👎 Not Helpful", key=f"bad_{item['query']}"):
+                st.warning("Feedback recorded.")
         # Response time chip
         rt = item.get("response_time", "?")
         rt_label = (f"⚡ {rt}s (cached)" if isinstance(rt, float) and rt < 0.1
