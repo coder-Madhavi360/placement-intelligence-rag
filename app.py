@@ -199,7 +199,7 @@ section[data-testid="stSidebar"] > div:first-child {
 /* User bubble */
 .chat-q { display:flex; justify-content:flex-end; margin:10px 0 2px 0; }
 .chat-q-bubble {
-    background: #2e5ff6; color: #fff;
+    background: #0f766e; color: #fff;
     border-radius: 18px 18px 4px 18px;
     padding: 10px 15px; max-width: 75%;
     font-size: 0.95rem; line-height: 1.5; word-wrap: break-word;
@@ -420,10 +420,18 @@ def render_hallucination_badge(h: dict):
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🎓 Placement RAG")
-    st.caption("SVECW · RAG-ATHON 24")
+    st.markdown("## 🚀 Placement Analytics")
+    st.caption("AI-Powered Placement Intelligence")
+    st.info("""
+📊 Dataset Overview
 
-    if st.button("➕ New Chat", use_container_width=True, type="primary"):
+• Companies: 20
+• Interviews: 19
+• Trend Records: 47
+• Conflict Cases: 10
+• Charts: 3
+""")
+    if st.button("➕ New Analysis", use_container_width=True, type="primary"):
         start_new_chat()
         st.rerun()
 
@@ -467,9 +475,9 @@ with st.sidebar:
 
 # ── Page header ───────────────────────────────────────────────────────────────
 st.markdown(
-    "<h2 style='text-align:center;margin-bottom:2px;'>🎓 Placement Intelligence Assistant</h2>"
+    "<h2 style='text-align:center;margin-bottom:2px;'>🚀 Placement Analytics Hub</h2>"
     "<p style='text-align:center;color:#888;font-size:0.83rem;margin-bottom:1rem;'>"
-    "SVECW · RAG-ATHON 24 &nbsp;|&nbsp; Hybrid RAG + Groq + Vision + Temporal Reasoning</p>",
+    "Multimodal RAG System • Eligibility Analysis • Interview Intelligence • Trend Analytics</p>",
     unsafe_allow_html=True,
 )
 
@@ -479,7 +487,7 @@ current_session = get_current_session()
 if not current_session or not current_session.get("messages"):
     st.markdown(
         "<div style='text-align:center;color:#555;margin-top:80px;font-size:1rem;'>"
-        "Ask anything about placements at SVECW ↓</div>",
+       "Analyze eligibility, packages, hiring trends and interview experiences ↓</div>",
         unsafe_allow_html=True,
     )
 else:
@@ -534,7 +542,7 @@ else:
         h_data      = parse_hallucination(item.get("chain_of_thought", ""))
 
         if has_sources or h_data:
-            with st.expander("📚 Sources", expanded=False):
+            with st.expander("📚 Retrieved Evidence", expanded=False):
                 if has_sources:
                     st.markdown(
                         f'<div class="sources-block">'
@@ -563,7 +571,7 @@ col_input, col_send = st.columns([6, 1])
 with col_input:
     query = st.text_input(
         label="input", label_visibility="collapsed",
-        placeholder="Ask a placement question…",
+        placeholder="Ask about eligibility, packages, trends or interviews...",
         key=f"chat_input_{st.session_state.input_key}",
     )
 with col_send:
