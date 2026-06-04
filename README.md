@@ -1,6 +1,6 @@
 # Placement Intelligence Assistant
 
-> A production-grade Multimodal RAG system for placement intelligence — built for RAG-ATHON 24 at SVECW, Department of Information Technology.
+> An enterprise-style Placement Intelligence Assistant built using Hybrid Retrieval, Safety-Aware Generation, Tool-Augmented Reasoning, Vision Processing, and Automated Evaluation.
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat-square&logo=python)
 ![Streamlit](https://img.shields.io/badge/UI-Streamlit-red?style=flat-square&logo=streamlit)
@@ -11,95 +11,103 @@
 
 ---
 
-## Table of Contents
+## Project Overview
 
-- [Project Description](#project-description)
-- [Why This Project](#why-this-project)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Project Structure](#project-structure)
-- [How to Install and Run](#how-to-install-and-run)
-- [How to Use the Project](#how-to-use-the-project)
-- [RAG Pipeline — 6 Stages](#rag-pipeline--6-stages)
-- [Chunking Strategy](#chunking-strategy)
-- [Tool-Augmented Agent](#tool-augmented-agent)
-- [Evaluation Results](#evaluation-results)
-- [Credits](#credits)
-- [License](#license)
+Placement Intelligence Assistant is a multimodal RAG system that helps students explore placement information using natural language queries.
 
----
+The system combines:
 
-## Project Description
+- Hybrid Search (FAISS + BM25)
+- CrossEncoder Reranking
+- Vision-Based Chart Understanding
+- Tool-Augmented Query Routing
+- Multi-Hop Reasoning
+- Hallucination Prevention
+- Automated Evaluation Framework
 
-The **Placement Intelligence Assistant** is a full-stack Retrieval-Augmented Generation (RAG) system built on top of the SVECW Placement Dataset for RAG-ATHON 24.
-
-It answers student placement queries — eligibility filtering, package comparisons, interview preparation, trend analysis, conflict detection, and multi-hop reasoning — with grounded, hallucination-resistant answers powered by Groq's Llama-3.1 model.
-
-The system handles every content modality present in the PDF:
-
-- **Structured tables** — eligibility criteria, hiring distribution, overall statistics
-- **Free-text narratives** — interview experiences split per round
-- **Bar chart images** — rendered as PNG and described by Groq vision model
-- **Temporal trend data** — package growth per company per year (2021–2024)
-- **Conflicting records** — intentionally mismatched official vs portal data
-- **Out-of-corpus questions** — routed to tools instead of hallucinating
-
-Each content type gets its own chunking, retrieval, and reasoning strategy — exactly as specified in Section 10 of the dataset PDF.
+It can answer questions related to eligibility, hiring trends, package analysis, interview experiences, company comparisons, and placement statistics.
 
 ---
 
-## Why This Project
+## Why This Project?
 
-Standard RAG systems fail on placement datasets for several reasons:
+Placement reports contain:
 
-- PDF tables get merged into garbled text by naive parsers
-- Bar charts are vector graphics invisible to text extractors
-- The same company data appears from two sources with different values
-- Some questions have no answer in the document and need graceful fallback
-- Aggregation queries like "highest paying" need reasoning across many chunks
-- Time-based queries like "grew the most since 2021" need year-tagged metadata
+| Content Type | Challenge |
+|-------------|------------|
+| Tables | Difficult to retrieve accurately |
+| Charts | Invisible to traditional RAG systems |
+| Interview Experiences | Long unstructured text |
+| Trend Data | Requires year-wise reasoning |
+| Conflicting Records | Multiple sources may disagree |
 
-This project solves all of the above with a layered, modular architecture built on SOLID principles. Every stage is abstracted behind an interface so components can be swapped without touching the pipeline.
+To solve these challenges, this project uses:
+
+- Content-aware chunking
+- Hybrid retrieval
+- CrossEncoder reranking
+- Vision-powered chart extraction
+- Conflict detection
+- Tool routing for external queries
+- Hallucination guards
+
+The result is a reliable placement intelligence assistant capable of answering both simple and complex placement-related questions.
 
 ---
 
 ## Features
 
-- **Hybrid Search** — Dense FAISS embeddings plus sparse BM25 combined with Reciprocal Rank Fusion
-- **CrossEncoder Reranking** — `ms-marco-MiniLM-L-6-v2` for high-precision reranking after broad retrieval
-- **Vision Chart Support** — Groq `llama-4-scout` reads bar charts and trend graphs rendered as page images
-- **Content-Aware Chunking** — Six different chunking strategies based on content type, following Section 10 of the dataset exactly
-- **TF-IDF Deduplication** — Reduces 400+ raw chunks to 80–120 meaningful ones using cosine similarity
-- **Conflict Detection** — Flags official vs portal source disagreements and never silently returns one value
-- **Fallback Guard** — Out-of-corpus queries receive honest "not in documents" responses
-- **AIMD Overshadow Limiter** — Binary-search context cap prevents hallucination from context overload
-- **Temporal Reasoning** — Year-tagged trend chunks enable growth calculations across 2021–2024
-- **Aggregation Query Boosting** — Injects all relevant section chunks for highest/lowest/best comparisons
-- **Multi-Hop Reasoning** — Structured step-by-step filtering across eligibility, hiring, and package data
-- **Tool-Augmented Agent** — Web search, calculator, date, and opinion guard tools for unanswerable questions
-- **Query Rewriting** — Expands each query into 2–4 variants for better recall
-- **Query Caching** — `@st.cache_data` with 1-hour TTL; response time naturally shows cache effect
-- **Persistent Chat History** — ChatGPT-style sidebar history saved to disk and restored on reload
-- **34-Query Evaluator** — Automated scoring across Easy, Medium, Hard, Expert, and Multi-hop difficulty levels
-- **Rate Limit Protection** — Auto-retry with backoff on Groq API 429 errors
+- **Hybrid Retrieval Engine** — Combines FAISS semantic search and BM25 keyword search for better retrieval accuracy.
+
+- **Query Rewriting** — Expands user queries into multiple search variations to improve recall.
+
+- **CrossEncoder Reranking** — Reorders retrieved chunks to surface the most relevant information.
+
+- **Multimodal Chart Understanding** — Converts placement charts and graphs into searchable text using vision models.
+
+- **Content-Aware Chunking** — Applies different chunking strategies for tables, narratives, trends, and chart data.
+
+- **Context Compression** — Removes redundant context before generation to improve answer quality.
+
+- **Conflict Detection System** — Identifies contradictory information from multiple data sources.
+
+- **Hallucination Prevention Layer** — Uses multiple safeguards to reduce unsupported responses.
+
+- **Tool Routing Framework** — Automatically routes real-time or external queries to specialized tools.
+
+- **Eligibility Analysis Tool** — Assists with CGPA-based eligibility and placement filtering.
+
+- **Temporal Reasoning Support** — Enables year-wise trend and growth analysis.
+
+- **Multi-Hop Question Answering** — Combines information from multiple document sections.
+
+- **Answer Verification Pipeline** — Validates generated responses before presenting them.
+
+- **Persistent Chat History** — Maintains conversation history across application sessions.
+
+- **Evaluation Dashboard** — Measures retrieval and generation quality using benchmark queries.
+
+- **Performance Monitoring** — Tracks retrieval quality, latency, and system behavior.
+
+- **Modular SOLID Architecture** — Each component is independent, reusable, and easy to extend.
 
 ---
 
 ## Technologies Used
 
-| Category | Technology | Purpose |
-|---|---|---|
-| PDF Parsing | Docling 2.x + pdfplumber | Layout-aware extraction with table fallback |
-| Vision | Groq llama-4-scout-17b | Chart image to text conversion |
-| Embedding | all-MiniLM-L6-v2 | Dense vector embeddings |
-| Vector Store | FAISS IndexFlatIP | Fast dense similarity search |
-| Sparse Search | BM25Okapi | Keyword-based sparse retrieval |
-| Fusion | Reciprocal Rank Fusion | Combining dense and sparse results |
-| Reranking | cross-encoder/ms-marco-MiniLM-L-6-v2 | Precision reranking |
-| LLM | Groq llama-3.1-8b-instant | Fast answer generation |
-| Web Search | ddgs (DuckDuckGo) | Real-time out-of-corpus queries |
-| UI | Streamlit | Interactive web interface |
-| Language | Python 3.11 | Core implementation |
+| Layer | Technology | Purpose |
+|---------|------------|----------|
+| Document Parsing | Docling + pdfplumber | PDF extraction and table processing |
+| Embeddings | all-MiniLM-L6-v2 | Dense vector generation |
+| Vector Search | FAISS | Semantic retrieval |
+| Sparse Search | BM25 | Keyword retrieval |
+| Fusion | Reciprocal Rank Fusion | Hybrid search ranking |
+| Reranking | CrossEncoder | Retrieval refinement |
+| Vision Model | Groq Llama-4-Scout | Chart understanding |
+| LLM | Groq Llama-3.1 | Answer generation |
+| Web Search | DuckDuckGo | External information retrieval |
+| UI | Streamlit | Interactive interface |
+| Language | Python | Core implementation |
 
 ---
 
@@ -167,82 +175,122 @@ placement-rag/
 
 ---
 
-## How to Install and Run
+## Quick Start
 
 ### Prerequisites
 
-- Python 3.11 or higher
-- Git
-- A free [Groq API key](https://console.groq.com) — no credit card required
+| Requirement | Version |
+|------------|-----------|
+| Python | 3.11+ |
+| Git | Latest |
+| Groq API Key | Required |
 
-### Step 1 — Clone the repository
+---
+
+### 1. Clone Repository
 
 ```bash
-git clone https://github.com/Harshini6364/placement-rag.git
-cd placement-rag
+git clone https://github.com/madhavi-b24/placement-intelligence-rag.git
+cd placement-intelligence-rag
 ```
 
-### Step 2 — Create a virtual environment
+---
+
+### 2. Create Virtual Environment
 
 ```bash
 python -m venv venv
+```
+
+Activate environment:
+
+**Windows**
+
+```bash
 venv\Scripts\activate
 ```
 
-### Step 3 — Install dependencies
+**Linux / Mac**
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4 — Set up environment variables
+---
 
-```bash
-copy .env.example .env
-```
+### 4. Configure Environment
 
-Open `.env` and add your Groq API key:
+Create a `.env` file:
 
 ```env
-GROQ_API_KEY=your_groq_api_key_here
+GROQ_API_KEY=your_api_key
 GROQ_MODEL=llama-3.1-8b-instant
-EMBED_MODEL=all-MiniLM-L6-v2
-FAISS_INDEX_PATH=data/faiss_index
-BM25_PATH=data/bm25_store.pkl
-CHUNKS_PATH=data/chunks.pkl
-TOP_K_RETRIEVE=20
-TOP_K_RERANK=5
 ```
 
-### Step 5 — Place the PDF
+---
 
-Copy `Placement_RAG_Dataset_Enhanced.pdf` into the `data/` folder.
+### 5. Add Dataset
 
-### Step 6 — Run ingestion (one time only)
+Place the dataset PDF inside:
+
+```text
+data/
+└── Placement_RAG_Dataset_Enhanced.pdf
+```
+
+---
+
+### 6. Build Retrieval Index
 
 ```bash
 python scripts/ingest.py
 ```
 
-Expected output:
+This step:
 
-```
-Eligibility chunks: 20
-Interview chunks added: 19
-Hiring chunks added: 20
-Trend chunks added: 47
-Conflict chunks added: 10
-Vision chart chunks added: 3
-Final chunk count: 119 (target: 80-150 ✓)
-```
+- Parses PDF content
+- Extracts tables
+- Processes chart images
+- Creates chunks
+- Generates embeddings
+- Builds BM25 + FAISS indexes
 
-### Step 7 — Launch the app
+---
+
+### 7. Launch Application
 
 ```bash
 streamlit run app.py
 ```
 
-Open [http://localhost:8501](http://localhost:8501) in your browser.
+Open:
+
+```text
+http://localhost:8501
+```
+
+---
+
+### 8. Run Evaluation Suite
+
+```bash
+python scripts/evaluate.py
+```
+
+Generated files:
+
+```text
+data/eval_results.csv
+data/multihop_results.csv
+```
 
 ---
 
@@ -306,55 +354,119 @@ Before Stage 1, a **Tool Router** classifies the query. Out-of-corpus queries ar
 
 ---
 
-## Chunking Strategy
+## Content Processing Strategy
 
-Implemented exactly per Section 10 of the dataset PDF:
+The placement dataset contains multiple content formats including tables, interview narratives, hiring statistics, trend records, conflict entries, and chart images.
 
-| Content Type | Strategy | Chunk Size | Key Metadata |
-|---|---|---|---|
-| Eligibility table | 1 company = 1 chunk | ~80 tokens | `company`, `section=eligibility` |
-| Interview experiences | Paragraph split per round | 200–300 tokens | `company`, `round_number` |
-| Hiring distribution | 1 company = 1 chunk | ~60 tokens | `chart_type=hiring` |
-| Trend data | 1 company per year | ~40 tokens | `company`, `year` |
-| Conflict records | Both versions stored | ~50 tokens | `source=official/portal`, `conflict=True` |
-| Chart images | Groq vision → text | ~100 tokens | `source=vision` |
-| Adversarial queries | **Not embedded** | — | Evaluation only |
+To maximize retrieval accuracy, each content type is processed using a dedicated chunking strategy.
 
-An unoptimised pipeline on this document produces 400+ chunks. After content-aware chunking and TF-IDF deduplication, this system produces 119 meaningful chunks.
+| Content Source | Processing Method | Purpose |
+|----------------|-------------------|----------|
+| Eligibility Data | One company per chunk | Fast eligibility filtering |
+| Interview Experiences | Round-wise paragraph chunking | Interview preparation queries |
+| Hiring Statistics | Company-level chunks | Hiring trend analysis |
+| Package Trends | Year-specific chunks | Temporal reasoning |
+| Conflict Records | Dual-source preservation | Conflict detection |
+| Chart Images | Vision-to-text conversion | Multimodal retrieval |
+| Evaluation Queries | Excluded from indexing | Benchmark testing only |
+
+### Metadata Attached To Chunks
+
+| Metadata | Usage |
+|-----------|---------|
+| Company Name | Company-specific retrieval |
+| Section Type | Context filtering |
+| Year | Temporal analysis |
+| Source | Conflict verification |
+| Round Number | Interview reasoning |
+| Chart Type | Chart-specific retrieval |
+
+### Corpus Optimization
+
+| Stage | Result |
+|---------|---------|
+| Raw Document Extraction | 400+ chunks |
+| Content-Aware Chunking | Reduced redundancy |
+| TF-IDF Deduplication | Removed duplicate content |
+| Final Search Corpus | Optimized retrieval dataset |
+
+This strategy improves retrieval precision, reduces context noise, and enables accurate multi-hop reasoning across different sections of the placement dataset.
+---
+
+## Tool-Augmented Intelligence Layer
+
+To handle questions that cannot be answered directly from the placement dataset, the system routes queries through specialized tools before generating a final response.
+
+| Tool | Function | Example Query |
+|--------|----------|---------------|
+| `web_search_tool` | Retrieves real-time information beyond the dataset | "When will TCS visit SVECW?" |
+| `calculator_tool` | Computes ratios, eligibility, and placement statistics | "What is Google's package-to-CGPA ratio?" |
+| `date_tool` | Handles current date and time calculations | "How many days until 31 Dec 2026?" |
+| `opinion_guard_tool` | Provides objective comparisons for subjective queries | "Should I join Google or Microsoft?" |
+| `answer_verifier_tool` | Validates generated answers against retrieved evidence | Internal verification |
+| `context_compression_tool` | Reduces irrelevant context before generation | Internal optimization |
+| `hallucination_scorer_tool` | Measures answer reliability and hallucination risk | Internal scoring |
+| `tool_router` | Selects the appropriate tool based on query intent | Query classification |
 
 ---
 
-## Tool-Augmented Agent
+## Evaluation Framework
 
-For questions the RAG corpus cannot answer, the tool router dispatches to the appropriate tool:
+The system is evaluated using a structured benchmark covering retrieval, reasoning, aggregation, and multi-hop questions.
 
-| Tool | Triggers | Example query |
-|---|---|---|
-| `web_search` | Campus dates, schedules, real-time info | *"When will TCS visit SVECW?"* |
-| `calculator` | Ratios, eligibility, below-threshold CGPA | *"I have CGPA 5.0, where can I apply?"* |
-| `current_date` | Date and time queries | *"What is today's date?"* |
-| `opinion_guard` | Subjective career questions | *"Should I join Google or Microsoft?"* |
+| Category | Focus Area |
+|------------|------------|
+| Easy | Direct fact retrieval |
+| Medium | Filtering and comparison queries |
+| Hard | Aggregation and synthesis |
+| Expert | Temporal and reasoning-intensive queries |
+| Multi-Hop | Cross-section reasoning and joins |
+| Out-of-Corpus | Tool routing and fallback handling |
 
-Calculator and opinion guard answers are supplemented with RAG context where available.
+### Evaluation Capabilities
 
----
-
-## Evaluation Results
-
-Scores on 34 official queries (30 from Section 9 + 4 multi-hop from Section 4):
-
-| Difficulty | Score | Queries |
-|---|---|---|
-| Easy | 87.5% | 8 |
-| Medium | 78.2% | 10 |
-| Hard | 78.6% | 7 |
-| Expert | 73.4% | 5 |
-| Multi-hop | 87.5% | 4 |
-| **Overall** | **77.9%** | **34** |
-
-Skills scoring 100%: Direct table lookup, Temporal reasoning, Full synthesis, Out-of-corpus fallback, 3-condition filter, Column filter, Hiring table aggregation, Chart/table comparison, Filter + sort, Join: tech + hiring, Multi-attribute comparison, Text retrieval + synthesis.
+- Direct Retrieval
+- Eligibility Filtering
+- Package Comparison
+- Temporal Reasoning
+- Aggregation Queries
+- Multi-Hop Reasoning
+- Conflict Detection
+- Tool Invocation
+- Hallucination Prevention
 
 ---
+
+
+
+## Future Improvements
+
+The current system provides a strong foundation for placement intelligence, but several enhancements can further improve its capabilities.
+
+| Improvement | Benefit |
+|------------|----------|
+| Conversational Memory | Better multi-turn question answering |
+| Advanced Agentic Workflows | Dynamic planning and tool orchestration |
+| Real-Time Placement Updates | Automatic synchronization with latest placement information |
+| Knowledge Graph Integration | Improved relationship-based reasoning |
+| Multilingual Support | Support for regional languages and English |
+| Voice-Based Interaction | Hands-free question answering experience |
+| Advanced Analytics Dashboard | Visual insights into placement trends and statistics |
+| Fine-Tuned Domain Model | Better understanding of placement-specific terminology |
+| Feedback-Driven Learning | Continuous improvement using user feedback |
+| Cloud Deployment | Scalable access for students and placement coordinators |
+| Role-Based Access Control | Separate views for students, faculty, and administrators |
+| Enhanced Evaluation Suite | Larger benchmark set with additional metrics |
+
+### Long-Term Vision
+
+- Build a complete AI-powered Placement Intelligence Platform.
+- Support multiple colleges and placement datasets.
+- Enable institution-wide analytics and reporting.
+- Provide personalized placement guidance for students.
+- Combine RAG, agents, tools, and analytics into a single ecosystem.
+---
+
 
 ## Credits
 
