@@ -37,6 +37,10 @@ class HybridRetriever(BaseRetriever):
             all_sparse.extend(sparse)
 
         fused = self._rrf_fuse(all_dense, all_sparse, top_k)
+        print("="*50)
+        print("FUSED CHUNKS:", len(fused))
+        for i, chunk in enumerate(fused[:10]):
+            print(i, chunk.metadata)
         quality = self._compute_quality(fused)
         overshadow = self._overshadow_risk(fused)
 

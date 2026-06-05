@@ -93,7 +93,9 @@ class RAGPipeline:
         )
 
     def run(self, query: str) -> RAGResponse:
-        logger.info(f"Pipeline start | query='{query}'")
+        print("RUN METHOD CALLED")
+        logger.info(f"USER QUERY={query}")
+    
 
         # ── Tool routing ───────────────────────────────────────────────
         if self.config.enable_tools:
@@ -149,11 +151,20 @@ class RAGPipeline:
         return self._run_rag(query)
 
     def _run_rag(self, query: str) -> RAGResponse:
+        print("="*50)
+        print("ENTERED_run_rag")
+        print("QUERY=",query)
+        print("="*50)
         # Stage 2: Retrieve
         result: RetrievalResult = self.retriever.retrieve(
             query, self.config.top_k_retrieve
         )
-
+        print("Retrieved chunks:", len(result.chunks))
+        for c in result.chunks[:10]:
+            try:
+                print(c.text[:200])
+            except:
+                pass
         # Stage 3: Rerank
         result = self.reranker.rerank(query, result)
         result.chunks = result.chunks[: self.config.top_k_rerank]
@@ -162,18 +173,22 @@ class RAGPipeline:
         conflicts = []
         if self.config.enable_conflict_detection:
             conflicts = self.conflict_detector.detect(result.chunks)
-
         fallback = False
+        print("QUERY:", query)
+        print("CHUNKS:", len(result.chunks))
+        print("CALLING FALLBACK GUARD...")
         if self.config.enable_fallback_guard:
-            fallback = self.fallback_guard.is_out_of_corpus(
-                query, result.chunks
-            )
+            fallback = self.fallback_guard.is_out_of_corpus(query,result.chunks )
+        print("FALLBACK RESULT:", fallback)
+
 
         # Stage 4: Refine
         result = self.refiner.refine(result, self.config.max_context_tokens)
 
         # Stage 5: Build prompt
+        print("PIPELINE CHUNKS=",len(result.chunks))
         prompt = self.prompt_builder.build(query, result)
+        print(prompt[:2000])
 
         # Stage 6: Generate WITH hallucination prevention
         answer, h_report = self.hallucination_guard.run(

@@ -12,6 +12,7 @@ from tools.web_search_tool import WebSearchTool
 from tools.calculator_tool import CalculatorTool
 from tools.date_tool import DateTool
 from tools.opinion_guard_tool import OpinionGuardTool
+from tools.intent_classifier import IntentClassifier
 
 logger = logging.getLogger(__name__)
 
@@ -23,42 +24,6 @@ class RouterDecision:
     reason: str
     result: ToolResult | None = None
 
-
-# Signals that indicate a query needs a tool instead of / in addition to RAG
-TOOL_SIGNALS = {
-    "web_search": [
-        "campus visit date", "when will", "visit svecw", "schedule",
-        "stock price", "current price", "market cap", "share price",
-        "work from home", "wfh", "remote work", "work mode",
-        "how many students placed", "institution-specific",
-        "latest news", "recent", "today",
-        "latest trend","latest trends","trend","trends",
-"ai trends","placement trends","industry trends",
-    ],
-    "calculator": [
-        "ratio", "package-to-cgpa", "best ratio",
-        "calculate", "compute", "how much",
-        "cgpa 5", "cgpa 6", "cgpa 7", "cgpa 8", "cgpa 9",
-        "cgpa of 5", "cgpa of 6", "cgpa of 7",      
-        "cgpa 5.0", "cgpa 4.0", "cgpa 3.0",
-        "highest in the world",    
-        "pays the most in the world",            
-        "with backlog", "i have cgpa", "my cgpa is",  
-        "where can i apply", "can i apply",
-        "eligible", "qualify",
-    ],
-    "current_date": [
-        "what date","today","current date","what day",
-    "when is","what time","days until","how many days","days left",
-    "countdown","date difference",
-    ],
-    "opinion_guard": [
-        "should i join", "which is better", "better career",
-        "recommend", "suggest", "what do you think",
-        "google or microsoft", "amazon or google",
-        "tcs or infosys", "which company should",
-    ],
-}
 
 
 class ToolRouter:
@@ -74,46 +39,24 @@ class ToolRouter:
             "current_date":  DateTool(),
             "opinion_guard": OpinionGuardTool(),
         }
+        self.classifier=IntentClassifier()
 
     def route(self, query: str) -> RouterDecision:
         """
         Returns a RouterDecision.
         If needs_tool=False, RAG pipeline handles it normally.
         """
-        q = query.lower()
+        intent = self.classifier.classify(query)
 
-        for tool_name, signals in TOOL_SIGNALS.items():
-            for signal in signals:
-                if signal in q:
-                    logger.info(f"Tool router: '{signal}' → {tool_name}")
-                    result = self.tools[tool_name].execute(query)
-                    return RouterDecision(
-                        needs_tool=True,
-                        tool_name=tool_name,
-                        reason=f"Matched signal: '{signal}'",
-                        result=result,
-                    )
+        if intent in self.tools:
+            result = self.tools[intent].execute(query)
 
-        # Below all CGPA thresholds
-        cgpa_match = re.search(r'cgpa\s*(?:of\s*)?(\d+\.?\d*)', q)
-        if cgpa_match:
-            cgpa = float(cgpa_match.group(1))
-            if cgpa < 6.3:
-                result = ToolResult(
-                    tool_name="calculator",
-                    success=True,
-                    output=(
-                        f"No company in this dataset accepts CGPA {cgpa}. "
-                        "The lowest cutoff is Samsung R&D at 6.3. "
-                        "Consider improving your CGPA or looking at other opportunities."
-                    ),
-                )
-                return RouterDecision(
-                    needs_tool=True,
-                    tool_name="calculator",
-                    reason=f"CGPA {cgpa} below all thresholds",
-                    result=result,
-                )
+            return RouterDecision(
+        needs_tool=True,
+        tool_name=intent,
+        reason=f"Semantic intent: {intent}",
+        result=result
+    )
 
         return RouterDecision(
             needs_tool=False,

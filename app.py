@@ -27,7 +27,7 @@ from feedback.loop import FeedbackLoop
 from feedback.storage import save_feedback
 
 logging.basicConfig(level=logging.WARNING)
-
+print("APP.PY LOADED")
 # ── Answer cleaning ───────────────────────────────────────────────────────────
 
 def clean_answer(text: str) -> str:
@@ -282,8 +282,12 @@ def save_all_sessions(sessions: list[dict]):
 
 
 # ── Pipeline ──────────────────────────────────────────────────────────────────
-@st.cache_data(ttl=3600, show_spinner=False)
+#@st.cache_data(ttl=3600, show_spinner=False)
 def cached_pipeline_run(query: str, top_k: int, top_rerank: int):
+    print("="*50)
+    print("CACHE FUNCTION CALLED")
+    print("QUERY=",query)
+    print("="*50)
     pipeline = st.session_state._pipeline
     pipeline.config.top_k_retrieve = top_k
     pipeline.config.top_k_rerank   = top_rerank
@@ -491,7 +495,7 @@ if not current_session or not current_session.get("messages"):
         unsafe_allow_html=True,
     )
 else:
-    for item in current_session["messages"]:
+    for idx,item in enumerate(current_session["messages"]):
 
         # User bubble
         q_html = item["query"].replace("<","&lt;").replace(">","&gt;")
@@ -525,11 +529,11 @@ else:
  # Feedback buttons
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("👍 Helpful", key=f"good_{item['query']}"):
+            if st.button("👍 Helpful", key=f"good_{idx}_{item['query']}"):
                 st.success("Thank you for your feedback!")
 
         with col2:
-            if st.button("👎 Not Helpful", key=f"bad_{item['query']}"):
+            if st.button("👎 Not Helpful", key=f"bad_{idx}_{item['query']}"):
                 st.warning("Feedback recorded.")
         # Response time chip
         rt = item.get("response_time", "?")

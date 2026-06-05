@@ -41,6 +41,8 @@ class GroqGenerator(BaseGenerator):
         answers = []
         for i in range(self.samples):
             try:
+                print("PROMPT SENT TO LLM:")
+                print(prompt[:5000])
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=[

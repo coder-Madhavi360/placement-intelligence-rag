@@ -1,0 +1,38 @@
+id,query,hops,answer,keyword_score,latency_s
+MH1,A student with CGPA 7.6 and 1 backlog wants the highest paying job they qualify for.,eligibility_filter → package_sort,"To find the highest paying job the student qualifies for, we need to filter the companies based on the given conditions and then compare the package offered.
+
+**Step 1: Filter by CGPA condition**
+The student has a CGPA of 7.6, which is greater than the minimum CGPA required by both Deloitte (7.7) an",0.0,7.6
+MH2,Which company that uses Python in interviews offers the highest package?,tech_focus_filter → package_sort,"To answer this question, I will follow the AGGREGATION rules.
+
+**Step 1: Scan all relevant chunks for companies using Python in interviews**
+
+From the provided context, the companies that use Python in interviews are:
+- Flipkart (Chunk 1)
+- Intel (Chunk 2)
+- Oracle (Chunk 3)
+- Google (Chunk 4)
+
+**St",1.0,9.58
+MH3,A student with CGPA 8.0 and 0 backlogs wants a company that hires many Analysts and pays above 20 LPA.,cgpa_filter → analyst_hiring_filter → package_filter,"Step 1: Filter companies where min_cgpa <= student_cgpa
+Student CGPA: 8.0
+Minimum CGPA required for each company:
+- SAP: 8.4 (not eligible)
+- Infosys: 8.0 (eligible)
+- Accenture: 8.2 (eligible)
+- Cognizant: 8.4 (not eligible)
+- Intel: 7.0 (eligible)
+
+Eligible companies after Step 1: Infosys, Accentu",1.0,10.69
+MH4,Which zero-bond companies offer more than 40 LPA?,bond_filter → package_filter,"To find the zero-bond companies offering more than 40 LPA, I will follow these steps:
+
+Step 1: Filter by zero-bond condition
+- Intel: Bond-free: Yes
+- Qualcomm: Bond-free: No
+- IBM: Bond-free: Yes
+- SAP: Bond-free: No
+- Accenture: Bond-free: No
+
+Companies with zero-bond: Intel, IBM
+
+Step 2: Filter b",0.5,9.63

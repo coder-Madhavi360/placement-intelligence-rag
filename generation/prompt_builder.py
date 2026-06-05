@@ -9,8 +9,8 @@ SYSTEM_PROMPT = """You are a Placement Intelligence Assistant for SVECW students
 
 STRICT RULES:
 1. Answer ONLY from the provided context chunks. Never invent data.
-2. If context lacks the answer, say exactly:
-   "I don't have enough information in the provided documents to answer this."
+2. Only use the fallback message if NO relevant chunk contains the requested information.
+   If relevant values exist across multiple chunks, combine them and answer.
 3. CONFLICT: If you see [OFFICIAL SOURCE] and [PORTAL SOURCE] for the same company
    with different values, say: "Conflicting data found — official: X, portal: Y. Verify with placement cell."
 4. TEMPORAL: For trend/growth questions, compare values across years using year metadata.
@@ -74,12 +74,30 @@ Think step by step, then give your final answer:"""
                 "Find year-tagged chunks and compute: growth = value_2024 - value_2021. "
                 "Show the arithmetic clearly."
             )
-        if any(w in q for w in ["highest", "most", "best", "rank", "maximum", "compare all", "bond-free", "list all", "which companies"]):                          
-            return (
-                "This is an AGGREGATION query. "
-                "Scan all chunks, list all relevant values, then identify the maximum/minimum. "
-                "Show the comparison table before your final answer."
-            )
+        if any(w in q for w in [
+    "highest",
+    "most",
+    "best",
+    "rank",
+    "maximum",
+    "compare",
+    "comparison",
+    "vs",
+    "versus",
+    "compare all",
+    "bond-free",
+    "list all",
+    "which companies"
+]):                       
+           return (
+    "This is a COMPARISON query. "
+    "Extract all companies mentioned in the question. "
+    "Find their package values from the retrieved chunks. "
+    "Compare them explicitly. "
+    "Do not return the fallback message when relevant values exist. "
+    "Give a final comparison table."
+) 
+
         if any(w in q for w in ["cgpa", "backlog", "qualify", "eligible", "apply"]):
             return (
                 "This is a MULTI-HOP ELIGIBILITY query. "
