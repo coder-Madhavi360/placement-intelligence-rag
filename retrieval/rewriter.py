@@ -1,6 +1,6 @@
 """
 retrieval/rewriter.py
-Query rewriting — expands a user query into multiple search variants.
+Query rewriting - expands a user query into multiple search variants.
 Handles temporal, eligibility, hiring, and conflict query types.
 """
 import re
@@ -18,74 +18,95 @@ COMPANY_ALIASES = {
     "accenture": "Accenture",
 }
 
+
 def extract_entities(query: str):
-    words = query.split()
+    q = query.lower()
+    matches = []
+    for alias, canonical in COMPANY_ALIASES.items():
+        pattern = rf"(?<!\w){re.escape(alias)}(?!\w)"
+        for match in re.finditer(pattern, q):
+            matches.append((match.start(), canonical))
+
     entities = []
-    for word in words:
-        if word.lower() in COMPANY_ALIASES:
-            entities.append(
-                COMPANY_ALIASES[word.lower()]
-            )
+    for _, canonical in sorted(matches):
+        if canonical not in entities:
+            entities.append(canonical)
     return entities
+
 
 class QueryRewriter:
     """
-    Expands the user query into 2-4 variants for better recall.
+    Expands the user query into recall-oriented variants.
     Rule-based + heuristic (no extra LLM call needed for speed).
     """
 
     def rewrite(self, query: str) -> list[str]:
         variants = [query]
         q = query.lower()
-
         entities = extract_entities(query)
 
-        if len(entities) >= 2:
-            variants.append( " ".join( [f"{e} package"for e in entities] ))
+        def add(variant: str) -> None:
+            variant = " ".join(variant.split())
+            if variant and variant not in variants:
+                variants.append(variant)
 
-        variants.append(
-        f"comparison between {' and '.join(entities)}" )
-        # Expand company names
-        for alias, canonical in COMPANY_ALIASES.items():
-            if alias in q:
-                variants.append(query.replace(alias, canonical))
-                variants.append(query.replace(alias, canonical).replace("?", ""))
+        # Expand company aliases while preserving multi-word entities.
+        canonical_query = query
+        for alias, canonical in sorted(
+            COMPANY_ALIASES.items(), key=lambda item: len(item[0]), reverse=True
+        ):
+            canonical_query = re.sub(
+                rf"(?<!\w){re.escape(alias)}(?!\w)",
+                canonical,
+                canonical_query,
+                flags=re.IGNORECASE,
+            )
+        if canonical_query != query:
+            add(canonical_query)
+            add(canonical_query.replace("?", ""))
 
         # Eligibility queries
         if any(w in q for w in ["cgpa", "backlog", "eligibility", "qualify", "eligible"]):
-            variants.append(f"minimum CGPA required package backlogs allowed {query}")
-            variants.append(f"eligibility criteria {query}")
+            target = " ".join(entities) if entities else query
+            add(f"eligibility criteria {target}")
+            add(f"minimum CGPA required maximum backlogs allowed package offered {target}")
 
         # Package queries
-        if any(w in q for w in ["package", "salary", "lpa", "pay", "highest"]):
-            variants.append(f"package LPA offered {query}")
+        if any(w in q for w in ["package", "salary", "lpa", "pay", "highest", "lowest"]):
+            if entities:
+                for entity in entities:
+                    add(f"{entity} package LPA offered")
+                add(" ".join(f"{entity} package" for entity in entities))
+            else:
+                add(f"package offered LPA company eligibility {query}")
+            add(f"package LPA offered {query}")
 
         # Temporal queries
         if any(w in q for w in ["trend", "increase", "grew", "growth", "2021", "2022", "2023", "2024"]):
-            variants.append(f"package trend year growth {query}")
+            add(f"package trend year growth {query}")
 
         # Hiring queries
         if any(w in q for w in ["hire", "analyst", "sde", "intern", "officer", "roles"]):
-            variants.append(f"hiring distribution SDE Analyst Officer Intern {query}")
-        
+            add(f"hiring distribution SDE Analyst Officer Intern {query}")
 
         # Comparison queries
-        if any(w in q for w in ["compare","difference","vs","versus"]):
-            entities = extract_entities(query)
-
         if len(entities) >= 2:
-            variants.append(" ".join([f"{e} package"for e in entities]) )
-            variants.append( f"comparison between {' and '.join(entities)}")
-            variants.append(f"compare companies salary package LPA {query}")
+            add(f"comparison between {' and '.join(entities)}")
+            if any(w in q for w in ["package", "salary", "lpa", "pay"]):
+                add(f"compare companies salary package LPA {query}")
 
         # Conflict queries
         if any(w in q for w in ["conflict", "discrepancy", "portal", "official", "different"]):
-            variants.append(f"conflicting records official portal {query}")
+            add(f"conflicting records official portal {query}")
 
         # Bond / constraint queries
         if any(w in q for w in ["bond", "bond-free", "no bond"]):
-            variants.append(f"bond period years bond-free {query}")
+            if entities:
+                for entity in entities:
+                    add(f"{entity} bond period years bond-free")
+                add(f"bond period years bond-free {' '.join(entities)}")
+            add(f"bond period years bond-free {query}")
 
         unique = list(dict.fromkeys(variants))  # preserve order, remove dupes
-        logger.debug(f"Rewrote '{query}' → {len(unique)} variants")
-        return unique[:4]  # cap at 4
+        logger.debug(f"Rewrote '{query}' -> {len(unique)} variants")
+        return unique[:8]  # broad enough for multi-company intent coverage

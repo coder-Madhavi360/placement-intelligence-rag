@@ -4,9 +4,11 @@ Hybrid retriever: dense (FAISS) + sparse (BM25) with RRF fusion.
 Includes retrieval quality scoring and overshadow risk estimation.
 """
 import logging
+import copy
+import re
 from collections import defaultdict
 from core.interfaces import BaseRetriever, RetrievalResult, Chunk
-from retrieval.rewriter import QueryRewriter
+from retrieval.rewriter import QueryRewriter, extract_entities
 from ingestion.embedder import HybridEmbedder
 
 logger = logging.getLogger(__name__)
@@ -37,6 +39,7 @@ class HybridRetriever(BaseRetriever):
             all_sparse.extend(sparse)
 
         fused = self._rrf_fuse(all_dense, all_sparse, top_k)
+        fused = self._ensure_intent_coverage(query, fused, top_k)
         print("="*50)
         print("FUSED CHUNKS:", len(fused))
         for i, chunk in enumerate(fused[:10]):
@@ -87,6 +90,63 @@ class HybridRetriever(BaseRetriever):
             chunk.score = score
             result.append(chunk)
         return result
+
+    def _ensure_intent_coverage(
+        self,
+        query: str,
+        chunks: list[Chunk],
+        top_k: int,
+    ) -> list[Chunk]:
+        q = query.lower()
+        entities = extract_entities(query)
+        needs_eligibility = any(
+            w in q
+            for w in [
+                "eligibility", "eligible", "qualify", "cgpa",
+                "backlog", "bond", "bond-free", "package",
+                "salary", "lpa", "pay", "highest", "lowest",
+            ]
+        )
+        if not needs_eligibility:
+            return chunks
+
+        additions = []
+        if entities:
+            for entity in entities:
+                match = self._official_eligibility_for(entity)
+                if match:
+                    additions.append(match)
+        elif re.search(r"\b(highest|lowest)\b", q) and any(
+            w in q for w in ["package", "salary", "lpa", "pay"]
+        ):
+            additions.extend(self._official_eligibility_chunks())
+
+        if not additions:
+            return chunks
+
+        seen = set()
+        covered = []
+        for chunk in additions + chunks:
+            if chunk.chunk_id in seen:
+                continue
+            seen.add(chunk.chunk_id)
+            covered.append(chunk)
+            if len(covered) >= top_k:
+                break
+        return covered
+
+    def _official_eligibility_for(self, company: str) -> Chunk | None:
+        for chunk in self._official_eligibility_chunks():
+            if chunk.company.lower() == company.lower():
+                return chunk
+        return None
+
+    def _official_eligibility_chunks(self) -> list[Chunk]:
+        return [
+            copy.copy(chunk)
+            for chunk in self.embedder.chunks
+            if chunk.section == "eligibility" and chunk.source == "official"
+        ]
 
     def _compute_quality(self, chunks: list[Chunk]) -> float:
         if not chunks:

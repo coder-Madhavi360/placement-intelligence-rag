@@ -36,8 +36,7 @@ class PlacementConflictDetector(BaseConflictDetector):
             ]
             conflicts.append(
                 f"Companies with conflicting records: "
-                f"{', '.join(companies_with_conflicts)}. "
-                f"These are: TCS, Amazon, Google, Infosys, Microsoft."
+                f"{', '.join(companies_with_conflicts)}."
             )
 
         return conflicts

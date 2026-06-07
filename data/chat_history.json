@@ -1,243 +1,5 @@
 [
   {
-    "id": "b713a8da-2257-4967-95c2-33a2818f8952",
-    "title": "compare amazon and microsoft packages",
-    "messages": [
-      {
-        "query": "compare amazon and microsoft packages",
-        "answer": "I don't have enough information in the provided documents to answer this.",
-        "sources": [],
-        "conflicts_detected": [],
-        "fallback_triggered": false,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.466,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 11.28
-      },
-      {
-        "query": "which company has both a high package and no bond",
-        "answer": "To find the company with both a high package and no bond, I will follow these steps:\n\n1. Filter by no bond condition: \n   - Qualcomm: No\n   - Accenture: No\n   - Flipkart: No\n   - Deloitte: No\n   - Oracle: No\n\n   All companies have a bond period, so none qualify for the \"no bond\" condition.\n\n2. Since no company meets the \"no bond\" condition, I will not proceed further.\n\nFinal Answer: No company qualifies.",
-        "sources": [
-          "ELIGIBILITY | Qualcomm",
-          "ELIGIBILITY | Accenture",
-          "ELIGIBILITY | Flipkart",
-          "ELIGIBILITY | Deloitte",
-          "ELIGIBILITY | Oracle"
-        ],
-        "conflicts_detected": [],
-        "fallback_triggered": false,
-        "retrieval_quality": 0.11739429235458373,
-        "context_tokens": 0.504,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 1.17
-      },
-      {
-        "query": "what is the latest package trend of amazon",
-        "answer": "To find the latest package trend of Amazon, we need to compare the values across years using year metadata.\n\nFrom Chunk 1, we know the overall package trend for Amazon from 2021 to 2024 started at 22.0 LPA and ended at 28.6 LPA.\n\nFrom Chunk 5, we know the package trend for Amazon in 2021 was 22.0 LPA.\n\nTo find the growth, we will subtract the value in 2021 from the value in 2024:\n\ngrowth = value_2024 - value_2021\ngrowth = 28.6 LPA - 22.0 LPA\ngrowth = 6.6 LPA\n\nHowever, we are asked to find the latest package trend, which is the value in 2024. \n\nSo, the latest package trend of Amazon is 28.6 LPA.",
-        "sources": [
-          "TREND | Amazon",
-          "TREND | Amazon | 2024",
-          "TREND | Amazon | 2023",
-          "TREND | Amazon | 2022",
-          "TREND | Amazon | 2021"
-        ],
-        "conflicts_detected": [],
-        "fallback_triggered": false,
-        "retrieval_quality": 0.7465741157531738,
-        "context_tokens": 0.467,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 1.77
-      }
-    ]
-  },
-  {
-    "id": "58a8e67a-6d42-4f59-a48b-3554cfaf8cf7",
-    "title": "who is the ceo of tcs",
-    "messages": [
-      {
-        "query": "who is the ceo of tcs",
-        "answer": "I don't have enough information in the provided documents to answer this. I don't have enough information in the provided documents to answer this.",
-        "sources": [],
-        "conflicts_detected": [],
-        "fallback_triggered": true,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 9.58
-      },
-      {
-        "query": "what is the package-to-CGPA ratio of google",
-        "answer": "Top 5 package-to-CGPA ratio:\n1. Intel: 5.914 LPA/CGPA\n2. Qualcomm: 5.736 LPA/CGPA\n3. Google: 5.676 LPA/CGPA\n4. Capgemini: 5.394 LPA/CGPA\n5. Infosys: 5.362 LPA/CGPA\n\nAdditional context from documents:\nTo answer the question, we need to follow the MULTI-HOP ELIGIBILITY query steps.\n\n**Step 1: Filter companies where min_cgpa <= student_cgpa**\nSince the question doesn't provide the student's CGPA, we'll assume it's a general query. We'll use the minimum CGPA from the eligibility chunk (7.4) as the threshold.\n\n**Step 2: Filter where max_backlogs >= student_backlogs**\nAgain, we don't have the student's backlog information. We'll assume it's a general query and use the maximum backlogs allowed from the eligibility chunk (0) as the threshold.\n\n**Step 3: Sort remaining by package descending**\nWe have the package information from the eligibility chunk (42.0 LPA).\n\nSince we're not filtering or sorting based on specific student information, we'll use the provided package value as the basis for our calculation.\n\nThe package-to-CGPA ratio is calculated as: package / min_cgpa\n= 42.0 LPA / 7.4\n= 5.675 LPA/CGPA\n\nSo, the package-to-CGPA ratio of Google is approximately 5.675 LPA/CGPA.\n\n\u26a0\ufe0f Note: Minor concern: low lookback ratio (0.27). Trust: 53.4/100 (C). Answer may contain hallucinations. Check key facts in the source document.",
-        "sources": [
-          "tool:calculator",
-          "CONFLICT | Google | CONFLICT",
-          "CONFLICT | Google | CONFLICT",
-          "ELIGIBILITY | Google",
-          "TREND | Google",
-          "TREND | Google | 2022"
-        ],
-        "conflicts_detected": [
-          "\u26a0\ufe0f Conflicting data for Google: official and portal sources disagree. Verify with placement cell.",
-          "Companies with conflicting records: Google. These are: TCS, Amazon, Google, Infosys, Microsoft."
-        ],
-        "fallback_triggered": false,
-        "retrieval_quality": 0.47763495445251464,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Tool: calculator | Matched signal: 'ratio'",
-        "response_time": 2.16
-      },
-      {
-        "query": "how many days until 31 Dec 2026",
-        "answer": "I don't have enough information in the provided documents to answer this. I don't have enough information in the provided documents to answer this.",
-        "sources": [],
-        "conflicts_detected": [],
-        "fallback_triggered": true,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 1.34
-      },
-      {
-        "query": "should i join google or microsoft",
-        "answer": "Google: 42.0 LPA | min CGPA 7.4 | bond 1yr | focus Python/Algorithms\nMicrosoft: 21.4 LPA | min CGPA 6.1 | bond None | focus C++/OS/DBMS\n\nObjective summary: Google pays more (42 vs 21.4 LPA) but has stricter algorithmic interviews. Microsoft has no bond and lower CGPA cutoff. Choice depends on your profile and interview prep.\n\nAdditional context from documents:\nI don't have enough information in the provided documents to answer this. I don't have enough information in the provided documents to answer this.",
-        "sources": [
-          "tool:opinion_guard"
-        ],
-        "conflicts_detected": [],
-        "fallback_triggered": false,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Tool: opinion_guard | Matched signal: 'should i join'",
-        "response_time": 0.64
-      },
-      {
-        "query": "latest ai placement trends",
-        "answer": "I don't have enough information in the provided documents to answer this. I don't have enough information in the provided documents to answer this.",
-        "sources": [],
-        "conflicts_detected": [],
-        "fallback_triggered": true,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 1.07
-      }
-    ]
-  },
-  {
-    "id": "bdb037e5-40eb-4cf2-90ad-d33502cb69e6",
-    "title": "how many days until 31 dec 2026",
-    "messages": [
-      {
-        "query": "how many days until 31 dec 2026",
-        "answer": "Current date: Thursday, 04 June 2026. Time: 06:29 IST. Note: Campus visit schedules are not available in this dataset. Please check with your placement cell or official SVECW notices.",
-        "sources": [
-          "tool:current_date"
-        ],
-        "conflicts_detected": [],
-        "fallback_triggered": false,
-        "retrieval_quality": 1.0,
-        "context_tokens": 29,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Tool: current_date | Matched signal: 'days until'",
-        "response_time": 0.0
-      },
-      {
-        "query": "latest ai placements trends",
-        "answer": "- AI in Online Advertising: 5 Key Trends from April 2026 | JumpFly Digital Marketing Blog: 1 month ago - Amazon launched Sponsored Products Prompts and Sponsored Brands Prompts in the U.S. on March 25, making paid placements inside Rufus, its AI shopping assistant, generally available to al\n- Boost Campus Placements with AI: 10 Strategies That Work in 2026: The average varies significantly ... colleges average 30-50% placements with \u20b92.5-4 LPA packages. However, campus hiring in India surged 24% in 2025, showing positive market trends and opportunities f\n- Latest AI Trends for 2026 & Beyond: What Businesses Need to Know: 2 weeks ago - Keep pace with the top AI trends: digital twins, multi-modal AI, agentic AI, and more. Uncover their impact and future across multiple sectors. Read on",
-        "sources": [
-          "https://www.jumpfly.com/blog/ai-in-online-advertising-5-key-trends-from-april-2026/"
-        ],
-        "conflicts_detected": [],
-        "fallback_triggered": false,
-        "retrieval_quality": 1.0,
-        "context_tokens": 131,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Tool: web_search | Matched signal: 'trend'",
-        "response_time": 6.88
-      },
-      {
-        "query": "what is the package-to-cgpa ratio of google",
-        "answer": "Top 5 package-to-CGPA ratio:\n1. Intel: 5.914 LPA/CGPA\n2. Qualcomm: 5.736 LPA/CGPA\n3. Google: 5.676 LPA/CGPA\n4. Capgemini: 5.394 LPA/CGPA\n5. Infosys: 5.362 LPA/CGPA\n\nAdditional context from documents:\nTo find the package-to-cgpa ratio of Google, we need to follow the steps for a MULTI-HOP ELIGIBILITY query.\n\n**Step 1: Filter companies where min_cgpa <= student_cgpa**\nSince the question doesn't specify a student's CGPA, we'll assume a general CGPA of 7.5 (the highest value mentioned in the context).\n\nFrom Chunk 1, the official CGPA cutoff for Google is 7.4, and from Chunk 2, the minimum CGPA required is 7.4. Since 7.5 is greater than or equal to 7.4, Google qualifies for this step.\n\n**Step 2: Filter where max_backlogs >= student_backlogs**\nSince the question doesn't specify a student's backlogs, we'll assume a general backlog of 0 (the maximum value mentioned in the context).\n\nFrom Chunk 2, the maximum backlogs allowed for Google is 0. Since 0 is greater than or equal to 0, Google qualifies for this step.\n\n**Step 3: Sort remaining by package descending**\nFrom Chunk 2, the package offered by Google is 42.0 LPA.\n\nNow, to find the package-to-cgpa ratio, we'll divide the package by the CGPA (assuming a general CGPA of 7.5).\n\nPackage-to-cgpa ratio = Package / CGPA = 42.0 LPA / 7.5 = 5.6\n\nSo, the package-to-cgpa ratio of Google is 5.6.\n\n\u26a0\ufe0f Note: Minor concern: low lookback ratio (0.42). Trust: 66.2/100 (C). Answer may contain hallucinations. Check key facts in the source document.",
-        "sources": [
-          "tool:calculator",
-          "CONFLICT | Google | CONFLICT",
-          "CONFLICT | Google | CONFLICT",
-          "ELIGIBILITY | Google",
-          "TREND | Google",
-          "TREND | Google | 2022"
-        ],
-        "conflicts_detected": [
-          "\u26a0\ufe0f Conflicting data for Google: official and portal sources disagree. Verify with placement cell.",
-          "Companies with conflicting records: Google. These are: TCS, Amazon, Google, Infosys, Microsoft."
-        ],
-        "fallback_triggered": false,
-        "retrieval_quality": 0.47763495445251464,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Tool: calculator | Matched signal: 'ratio'",
-        "response_time": 16.8
-      },
-      {
-        "query": "should i join google or microsoft",
-        "answer": "Google: 42.0 LPA | min CGPA 7.4 | bond 1yr | focus Python/Algorithms\nMicrosoft: 21.4 LPA | min CGPA 6.1 | bond None | focus C++/OS/DBMS\n\nObjective summary: Google pays more (42 vs 21.4 LPA) but has stricter algorithmic interviews. Microsoft has no bond and lower CGPA cutoff. Choice depends on your profile and interview prep.\n\nAdditional context from documents:\nI don't have enough information in the provided documents to answer this. I don't have enough information in the provided documents to answer this.",
-        "sources": [
-          "tool:opinion_guard"
-        ],
-        "conflicts_detected": [],
-        "fallback_triggered": false,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Tool: opinion_guard | Matched signal: 'should i join'",
-        "response_time": 0.88
-      }
-    ]
-  },
-  {
-    "id": "1f231328-f234-4c04-a58f-2086e4fb9f45",
-    "title": "who is the ceo of tcs",
-    "messages": [
-      {
-        "query": "who is the ceo of tcs",
-        "answer": "I don't have enough information in the provided documents to answer this. I don't have enough information in the provided documents to answer this.",
-        "sources": [],
-        "conflicts_detected": [],
-        "fallback_triggered": true,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 15.07
-      }
-    ]
-  },
-  {
-    "id": "9061b403-523d-48ad-95d1-62620ea80201",
-    "title": "compare amazon and microsoft packages",
-    "messages": [
-      {
-        "query": "compare amazon and microsoft packages",
-        "answer": "I don't have enough information in the provided documents to answer this. I don't have enough information in the provided documents to answer this.",
-        "sources": [],
-        "conflicts_detected": [],
-        "fallback_triggered": true,
-        "retrieval_quality": 0.0,
-        "context_tokens": 0.1,
-        "self_consistency_score": 1.0,
-        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
-        "response_time": 18.99
-      }
-    ]
-  },
-  {
     "id": "2fc81f14-5418-419e-8b66-e732eebcb0d1",
     "title": "compare amazon and microsoft packages",
     "messages": [
@@ -1005,6 +767,230 @@
         "self_consistency_score": 0.696,
         "chain_of_thought": "Verdict: PASS | SC: 0.70 | Recitation: 1.00 | Chain: True",
         "response_time": 10.15
+      }
+    ]
+  },
+  {
+    "id": "e98f167c-b043-42b9-a30d-d6e21e9b84b2",
+    "title": "microsoft eligibility",
+    "messages": [
+      {
+        "query": "microsoft eligibility",
+        "answer": "=== RETRIEVED CONTEXT (0 chunks) ===\n\nSince there is no context provided, I will start with an empty response.\n\nHowever, I can guide you through the process of answering the question.\n\nTo answer the eligibility question for Microsoft, we would typically need information about the eligibility criteria for Microsoft placements, such as CGPA, backlogs, and package.\n\nSince no context is provided, let's assume we will add chunks as we go along.\n\nPlease provide the context chunks for Microsoft eligibility.\n\n\u26a0\ufe0f Note: Minor concern: low consistency (0.19). Trust: 79.8/100 (B). Answer is mostly reliable. Verify any specific numbers against the source.",
+        "sources": [],
+        "conflicts_detected": [
+          "\u26a0\ufe0f Conflicting data for Microsoft: official and portal sources disagree. Verify with placement cell.",
+          "Companies with conflicting records: Microsoft. These are: TCS, Amazon, Google, Infosys, Microsoft."
+        ],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.194,
+        "chain_of_thought": "Verdict: WARN | SC: 0.19 | Recitation: 1.00 | Chain: True",
+        "response_time": 10.02
+      }
+    ]
+  },
+  {
+    "id": "26af177a-d68d-4601-8b19-82f863ce9384",
+    "title": "microsoft eligibility",
+    "messages": [
+      {
+        "query": "microsoft eligibility",
+        "answer": "=== RETRIEVED CONTEXT (0 chunks) ===\n\nSince there's no context provided, I don't have enough information to answer this.",
+        "sources": [],
+        "conflicts_detected": [
+          "\u26a0\ufe0f Conflicting data for Microsoft: official and portal sources disagree. Verify with placement cell.",
+          "Companies with conflicting records: Microsoft. These are: TCS, Amazon, Google, Infosys, Microsoft."
+        ],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 1.0,
+        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
+        "response_time": 9.03
+      }
+    ]
+  },
+  {
+    "id": "77113945-2d03-41d9-85f4-9e81f4cf5a90",
+    "title": "microsoft eligibility",
+    "messages": [
+      {
+        "query": "microsoft eligibility",
+        "answer": "=== RETRIEVED CONTEXT (0 chunks) ===\n\nSince there's no context provided, I don't have enough information to answer this.",
+        "sources": [],
+        "conflicts_detected": [
+          "\u26a0\ufe0f Conflicting data for Microsoft: official and portal sources disagree. Verify with placement cell.",
+          "Companies with conflicting records: Microsoft. These are: TCS, Amazon, Google, Infosys, Microsoft."
+        ],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 1.0,
+        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
+        "response_time": 8.74
+      }
+    ]
+  },
+  {
+    "id": "40e2291c-f26d-4a32-8f27-8f601aed670a",
+    "title": "microsoft eligibility",
+    "messages": [
+      {
+        "query": "microsoft eligibility",
+        "answer": "To determine Microsoft's eligibility criteria, we need to consider the following conditions:\n\nStep 1: Filter by CGPA condition\n- Minimum CGPA required: 6.1\n\nStep 2: Filter by backlog condition\n- Maximum backlogs allowed: 1\n\nStep 3: Sort by package (not required for eligibility, but mentioned for completeness)\n- Package offered: 21.4 LPA\n\nBased on the provided context, a student with a CGPA of 6.1 or above and no more than 1 backlog can be eligible for Microsoft.\n\nFinal Answer: A student with a CGPA of 6.1 or above and no more than 1 backlog can be eligible for Microsoft.\n\n\u26a0\ufe0f Note: Minor concern: low lookback ratio (0.40). Trust: 60.4/100 (C). Answer may contain hallucinations. Check key facts in the source document.",
+        "sources": [
+          "CONFLICT | Microsoft | CONFLICT",
+          "CONFLICT | Microsoft | CONFLICT",
+          "ELIGIBILITY | Microsoft",
+          "TREND | Microsoft",
+          "TREND | Microsoft | 2024"
+        ],
+        "conflicts_detected": [
+          "\u26a0\ufe0f Conflicting data for Microsoft: official and portal sources disagree. Verify with placement cell.",
+          "Companies with conflicting records: Microsoft. These are: TCS, Amazon, Google, Infosys, Microsoft."
+        ],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.518,
+        "chain_of_thought": "Verdict: WARN | SC: 0.52 | Recitation: 0.67 | Chain: True",
+        "response_time": 12.77
+      },
+      {
+        "query": "compare amazon and microsoft packages",
+        "answer": "To answer this comparison query, I will follow the instructions:\n\n1. Extract all companies mentioned in the question: Amazon and Microsoft.\n2. Find their package values from the retrieved chunks:\n   - Amazon: No relevant chunk found.\n   - Microsoft:\n     - 2021: 19.0 LPA (Chunk 3)\n     - 2022: 20.0 LPA (Chunk 2)\n     - 2021-2024: 21.4 LPA (Chunk 1)\n3. Compare them explicitly:\n\nSince Amazon's package value is not available in the provided chunks, I will only compare Microsoft's package values.\n\n| Year | Package (LPA) |\n| --- | --- |\n| 2021 | 19.0 |\n| 2022 | 20.0 |\n| 2021-2024 | 21.4 |\n\nNow, let's compare the values:\n\n- 2021: Amazon (not available) vs Microsoft (19.0 LPA)\n- 2022: Amazon (not available) vs Microsoft (20.0 LPA)\n- 2021-2024: Amazon (not available) vs Microsoft (21.4 LPA)\n\nSince Amazon's package value is not available, I will not include it in the final comparison table.\n\n**Final Comparison Table:**\n\n| Company | Package (LPA) |\n| --- | --- |\n| Microsoft (2021) | 19.0 |\n| Microsoft (2022) | 20.0 |\n| Microsoft (2021-2024) | 21.4 |",
+        "sources": [
+          "TREND | Microsoft",
+          "TREND | Microsoft | 2024",
+          "TREND | Microsoft | 2022",
+          "TREND | Microsoft | 2023",
+          "TREND | Microsoft | 2021"
+        ],
+        "conflicts_detected": [],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.737,
+        "chain_of_thought": "Verdict: PASS | SC: 0.74 | Recitation: 0.88 | Chain: True",
+        "response_time": 2.67
+      }
+    ]
+  },
+  {
+    "id": "67e09fc0-25e6-4642-8f12-df911d289fc6",
+    "title": "microsoft eligibility",
+    "messages": [
+      {
+        "query": "microsoft eligibility",
+        "answer": "To determine Microsoft's eligibility criteria, I will follow the steps:\n\nStep 1: Filter by CGPA condition\n- Minimum CGPA required: 6.1 (from Chunk 1)\n\nStep 2: Filter by backlog condition\n- Maximum backlogs allowed: 1 (from Chunk 1)\n\nStep 3: Sort by package\n- Package offered: 21.4 LPA (from Chunk 1 and Chunk 2)\n\nSince the package value is consistent across both chunks, I will use it for sorting.\n\nBased on the eligibility criteria, a student must have a CGPA of 6.1 or above, no more than 1 backlog, and a package of 21.4 LPA or above to be eligible for Microsoft.\n\nFinal Answer: A student with a CGPA of 6.1 or above, no more than 1 backlog, and a package of 21.4 LPA or above is eligible for Microsoft.\n\n\ud83d\udd34 Reliability warning: Multiple hallucination signals: low consistency (0.38); low lookback ratio (0.39). Trust: 63.3/100 (C). Answer may contain hallucinations. Check key facts in the source document. Please verify this answer against the source document.",
+        "sources": [
+          "CONFLICT | Microsoft | CONFLICT",
+          "CONFLICT | Microsoft | CONFLICT",
+          "ELIGIBILITY | Microsoft",
+          "TREND | Microsoft",
+          "TREND | Microsoft | 2024"
+        ],
+        "conflicts_detected": [
+          "\u26a0\ufe0f Conflicting data for Microsoft: official and portal sources disagree. Verify with placement cell.",
+          "Companies with conflicting records: Microsoft."
+        ],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.383,
+        "chain_of_thought": "Verdict: FAIL | SC: 0.38 | Recitation: 1.00 | Chain: True",
+        "response_time": 14.63
+      },
+      {
+        "query": "compare amazon and microsoft packages",
+        "answer": "To compare Amazon and Microsoft packages, I will follow the instructions:\n\n1. Extract all companies mentioned in the question: Amazon and Microsoft.\n2. Find their package values from the retrieved chunks:\n   - Amazon's package value: 28.6 LPA (Chunk 1 [ELIGIBILITY | Amazon])\n   - Microsoft's package value: 21.4 LPA (Chunk 2 [ELIGIBILITY | Microsoft])\n3. Compare them explicitly:\n\n| Company | Package (LPA) |\n| --- | --- |\n| Amazon | 28.6 |\n| Microsoft | 21.4 |\n\nBased on the comparison, Amazon offers a higher package than Microsoft.\n\n**Final Comparison Table:**\n\n| Company | Package (LPA) |\n| --- | --- |\n| Amazon | 28.6 |\n| Microsoft | 21.4 |",
+        "sources": [
+          "ELIGIBILITY | Amazon",
+          "ELIGIBILITY | Microsoft",
+          "TREND | Microsoft",
+          "TREND | Microsoft | 2024",
+          "TREND | Microsoft | 2022"
+        ],
+        "conflicts_detected": [],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.869,
+        "chain_of_thought": "Verdict: PASS | SC: 0.87 | Recitation: 1.00 | Chain: True",
+        "response_time": 3.12
+      },
+      {
+        "query": "what is microsoft package",
+        "answer": "To find the Microsoft package, I will look at the provided chunks.\n\nChunk 1 mentions the overall package trend for Microsoft from 2021 to 2024, starting at 19.0 LPA and ending at 21.4 LPA.\n\nChunk 2 specifically mentions the package trend for Microsoft in 2021 as 19.0 LPA.\n\nChunk 3 mentions the package trend for Microsoft in 2023 as 21.0 LPA.\n\nSince the question asks for the Microsoft package, I will consider the most recent value available, which is from Chunk 3.\n\nThe final answer is: 21.0 LPA.",
+        "sources": [
+          "TREND | Microsoft",
+          "TREND | Microsoft | 2022",
+          "TREND | Microsoft | 2024",
+          "TREND | Microsoft | 2021",
+          "TREND | Microsoft | 2023"
+        ],
+        "conflicts_detected": [],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.26408939361572265,
+        "context_tokens": 0.1,
+        "self_consistency_score": 1.0,
+        "chain_of_thought": "Verdict: PASS | SC: 1.00 | Recitation: 1.00 | Chain: True",
+        "response_time": 1.78
+      },
+      {
+        "query": "what is the bond period of tcs",
+        "answer": "To find the bond period of TCS, I will look at the provided context chunk.\n\nThe bond period of TCS is mentioned as: 0 years.\n\nFinal answer: 0 years.",
+        "sources": [
+          "ELIGIBILITY | TCS"
+        ],
+        "conflicts_detected": [],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.5444238185882568,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.562,
+        "chain_of_thought": "Verdict: PASS | SC: 0.56 | Recitation: 1.00 | Chain: True",
+        "response_time": 1.4
+      },
+      {
+        "query": "microsoft package",
+        "answer": "To find the Microsoft package, I'll look at the provided chunks.\n\nChunk 1 mentions the overall package trend for Microsoft from 2021 to 2024, starting at 19.0 LPA and ending at 21.4 LPA.\n\nChunk 2 specifically mentions the package trend for Microsoft in 2021 as 19.0 LPA.\n\nChunk 3 mentions the package trend for Microsoft in 2023 as 21.0 LPA.\n\nSince the question doesn't specify a particular year, I'll consider the most recent value mentioned, which is 21.0 LPA from Chunk 3.\n\nHowever, I also have the overall trend from Chunk 1, which ends at 21.4 LPA. Since 21.4 LPA is more recent than 21.0 LPA, I'll consider 21.4 LPA as the final answer.\n\nFinal answer: 21.4 LPA.",
+        "sources": [
+          "TREND | Microsoft",
+          "TREND | Microsoft | 2024",
+          "TREND | Microsoft | 2021",
+          "TREND | Microsoft | 2022",
+          "TREND | Microsoft | 2023"
+        ],
+        "conflicts_detected": [],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.6509340763092041,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.519,
+        "chain_of_thought": "Verdict: PASS | SC: 0.52 | Recitation: 1.00 | Chain: True",
+        "response_time": 2.31
+      },
+      {
+        "query": "what is microsoft eligibility",
+        "answer": "To determine Microsoft's eligibility, we need to consider the following conditions:\n\nStep 1: Filter by CGPA condition\n- Minimum CGPA required: 6.1\n\nStep 2: Filter by backlog condition\n- Maximum backlogs allowed: 1\n\nStep 3: Sort by package (not required for eligibility, but for completeness)\n- Package offered: 21.4 LPA\n\nSince the question is about eligibility, we don't need to sort by package. Based on the provided context, a student with a CGPA of 6.1 or above and 1 or fewer backlogs is eligible for Microsoft.\n\nFinal Answer: A student with a CGPA of 6.1 or above and 1 or fewer backlogs is eligible for Microsoft.\n\n\u26a0\ufe0f Note: Minor concern: low lookback ratio (0.41). Trust: 76.7/100 (B). Answer is mostly reliable. Verify any specific numbers against the source.",
+        "sources": [
+          "CONFLICT | Microsoft | CONFLICT",
+          "CONFLICT | Microsoft | CONFLICT",
+          "ELIGIBILITY | Microsoft",
+          "TREND | Microsoft",
+          "TREND | Microsoft | 2024"
+        ],
+        "conflicts_detected": [
+          "\u26a0\ufe0f Conflicting data for Microsoft: official and portal sources disagree. Verify with placement cell.",
+          "Companies with conflicting records: Microsoft."
+        ],
+        "fallback_triggered": false,
+        "retrieval_quality": 0.0,
+        "context_tokens": 0.1,
+        "self_consistency_score": 0.9,
+        "chain_of_thought": "Verdict: WARN | SC: 0.90 | Recitation: 1.00 | Chain: True",
+        "response_time": 1.87
       }
     ]
   }

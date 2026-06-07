@@ -191,6 +191,8 @@ class RecitationChecker:
             claim_lower = claim.lower().strip()
             if claim_lower in chunk_texts:
                 verified += 1
+            elif self._number_unit_supported(claim_lower, chunk_texts):
+                verified += 1
             else:
                 # Try partial match for numbers with units
                 core = re.sub(r'[^\d\.\w]', ' ', claim_lower).strip()
@@ -208,6 +210,33 @@ class RecitationChecker:
             f"score={score:.2f}"
         )
         return score, flagged
+
+    def _number_unit_supported(self, claim: str, chunk_texts: str) -> bool:
+        match = re.match(
+            r'\b(\d+\.?\d*)\s*(lpa|cgpa|%|years?|backlogs?)\b',
+            claim,
+        )
+        if not match:
+            return False
+
+        number, unit = match.groups()
+        unit_patterns = {
+            "lpa": r"\blpa\b|\bpackage\b",
+            "cgpa": r"\bcgpa\b|\bcutoff\b",
+            "%": r"%|\bpercent\b",
+            "year": r"\byears?\b|\bbond\b",
+            "years": r"\byears?\b|\bbond\b",
+            "backlog": r"\bbacklogs?\b",
+            "backlogs": r"\bbacklogs?\b",
+        }
+        unit_pattern = unit_patterns.get(unit.rstrip("s"), re.escape(unit))
+
+        for number_match in re.finditer(re.escape(number), chunk_texts):
+            start = max(0, number_match.start() - 48)
+            end = min(len(chunk_texts), number_match.end() + 48)
+            if re.search(unit_pattern, chunk_texts[start:end]):
+                return True
+        return False
 
     def _extract_claims(self, answer: str) -> list[str]:
         """Extract high-risk factual claims from answer text."""
